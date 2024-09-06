@@ -34,6 +34,11 @@ class SalesmanController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|digits:10|regex:/^[6789]/|unique:salesmen,phone',
+            'password' => 'required',
+        ]);
         $salesman = new Salesman();
         $salesman->status = $request->status;
         $salesman->name = $request->name;
@@ -79,6 +84,11 @@ class SalesmanController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|digits:10|regex:/^[6789]/',
+            'password' => 'required',
+        ]);
         $salesman = Salesman::find($id);
         $salesman->status = $request->status;
         $salesman->name = $request->name;

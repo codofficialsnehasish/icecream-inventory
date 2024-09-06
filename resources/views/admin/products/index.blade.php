@@ -55,8 +55,8 @@
                                     @foreach($proucts as $product)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ get_name('categories',$product->category) }}</td>
-                                        <td>{{ $product->name }}</td>
+                                        <td class="text-wrap">{{ get_name('categories',$product->category) }}</td>
+                                        <td class="text-wrap">{{ $product->name }}</td>
                                         <td>{{ $product->total_price }}</td>
                                         <td>
                                             <a class="" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{$product->id}}">
@@ -67,7 +67,7 @@
                                             </a>
                                         </td>
                                         <td><img src="{{ asset(get_product_image($product->id)) }}" alt="" width="60px"></td>
-                                        <td>{!! check_visibility(1) !!}</td>
+                                        <td>{!! check_visibility($product->visibility) !!}</td>
                                         <td>
                                             <a class="btn btn-primary" href="{{ route('products.basic-info-edit',$product->id) }}" alt="edit"><i class="ti-check-box"></i></a>
                                             <a class="btn btn-danger" onclick="return confirm('Are You Sure?')" href="{{ route('products.delete',$product->id) }}"><i class="ti-trash"></i></a>

@@ -60,7 +60,7 @@
                                         <td>{!! check_status($salesman->status) !!}</td>
                                         <td>
                                             <a class="btn btn-primary" href="{{ route('salesmans.edit',$salesman->id) }}" alt="edit"><i class="ti-check-box"></i></a>
-                                            <form action="{{ route('salesmans.destroy', $salesman->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('salesmans.destroy', $salesman->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>

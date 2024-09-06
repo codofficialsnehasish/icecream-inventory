@@ -15,7 +15,7 @@
                         <div class="col-md-8">
                             <h6 class="page-title">{{ $title }}</h6>
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('salesmans.index') }}">{{ $title }}</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">Add New {{ $title }}</li>
                             </ol>
@@ -86,11 +86,11 @@
                                         <label class="form-label mb-3 d-flex">Status</label>
                                         <div class="form-check form-check-inline">
                                             <input type="radio" id="customRadioInline1" name="status" class="form-check-input" value="1" checked>
-                                            <label class="form-check-label" for="customRadioInline1">Show</label>
+                                            <label class="form-check-label" for="customRadioInline1">Active</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input type="radio" id="customRadioInline2" name="status" class="form-check-input" value="0">
-                                            <label class="form-check-label" for="customRadioInline2">Hide</label>
+                                            <label class="form-check-label" for="customRadioInline2">Inactive</label>
                                         </div>
                                     </div>
                                     <div class="mb-0">

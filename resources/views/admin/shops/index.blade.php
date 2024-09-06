@@ -66,7 +66,7 @@
                                         <td>{!! check_visibility($shop->is_visible) !!}</td>
                                         <td>
                                             <a class="btn btn-primary" href="{{ route('shops.edit',$shop->id) }}" alt="edit"><i class="ti-check-box"></i></a>
-                                            <form action="{{ route('shops.destroy', $shop->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('shops.destroy', $shop->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>

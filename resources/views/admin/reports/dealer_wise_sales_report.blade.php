@@ -17,7 +17,7 @@
                     <div class="col-md-8">
                         <h6 class="page-title">Reports</h6>
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="{{url('/admin/dashboard')}}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="javascript:void(0)">Reports</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>

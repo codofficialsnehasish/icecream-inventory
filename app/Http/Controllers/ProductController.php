@@ -71,6 +71,11 @@ class ProductController extends Controller
     }
 
     public function basic_info_process(Request $request){
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'product_billing_name' => 'required',
+            'category_id' => 'required',
+        ]);
         $product = new Product();
         $product->name = $request->product_name;
         $product->billing_name = $request->product_billing_name;

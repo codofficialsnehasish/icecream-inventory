@@ -16,7 +16,7 @@
                             <h6 class="page-title">{{ $title }}</h6>
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('category.index') }}">{{ $title }}</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('products.index') }}">{{ $title }}</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">Add New {{ $title }}</li>
                             </ol>
                         </div>
@@ -95,11 +95,11 @@
                                 <div class="mb-3">
                                     <label class="form-label mb-3 d-flex">Visiblity</label>
                                     <div class="form-check form-check-inline">
-                                        <input type="radio" id="customRadioInline1" name="is_visible" class="form-check-input" value="1" checked>
+                                        <input type="radio" id="customRadioInline1" name="is_visible" class="form-check-input" value="1" {{ check_uncheck($product->visibility,1) }}>
                                         <label class="form-check-label" for="customRadioInline1">Show</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input type="radio" id="customRadioInline2" name="is_visible" class="form-check-input" value="0">
+                                        <input type="radio" id="customRadioInline2" name="is_visible" class="form-check-input" value="0" {{ check_uncheck($product->visibility,0) }}>
                                         <label class="form-check-label" for="customRadioInline2">Hide</label>
                                     </div>
                                 </div>

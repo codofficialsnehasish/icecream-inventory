@@ -57,7 +57,7 @@
                                         <td>
                                             <a class="btn btn-primary" href="{{ route('trucks.edit',$truck->id) }}" alt="edit"><i class="ti-check-box"></i></a>
                                             <!-- <a class="btn btn-danger" onclick="return confirm('Are You Sure?')" href="{{ route('products.delete',$truck->id) }}"><i class="ti-trash"></i></a> -->
-                                            <form action="{{ route('trucks.destroy', $truck->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('trucks.destroy', $truck->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
