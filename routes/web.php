@@ -20,6 +20,7 @@ use App\Http\Controllers\{
     Report_Controller,
     AccountsController,
     AccountsController2Controller,
+    PDFController,
 };
 
 Route::get('/', function (){
@@ -54,7 +55,8 @@ Route::middleware('auth')->group(function () {
         Route::controller(Settings::class)->group(function () {
             Route::get("/settings-contents","content")->name('settings-contents');
             Route::post("/add-content","add_content")->name('settings-contents.add');
-            Route::get("/mlm-settings","mlm_settings")->name('mlm-settings');
+            Route::get("/bill-settings","bill_settings")->name('bill-settings');
+            Route::post("/process-bill-settings","process_bill_settings")->name('process-bill-settings');
         });
 
         //========================= Roles & Permission =======================
@@ -205,3 +207,5 @@ Route::middleware('auth')->group(function () {
         Route::resource('accounts2', AccountsController2Controller::class);
     });
 });
+
+Route::get('/generate-pdf/{id?}', [PDFController::class, 'generatePDF'])->name('generate-pdf');

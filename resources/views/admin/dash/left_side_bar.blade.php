@@ -15,6 +15,7 @@
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('settings-contents') }}">Site Settings</a></li>
+                        <li><a href="{{ route('bill-settings') }}">Bill Settings</a></li>
                         {{--<li><a href="javascript: void(0);" class="has-arrow">Roles Permissions</a>
                             <ul class="sub-menu" aria-expanded="true">
                                 <li><a href="{{ route('roles') }}">Roles</a></li>

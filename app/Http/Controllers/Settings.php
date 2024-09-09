@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\General_settings;
+use App\Models\BillSettings;
 
 class Settings extends Controller
 {
@@ -48,5 +49,29 @@ class Settings extends Controller
         $obj->contact_address = $r->address;
         $obj->update();
         return redirect()->back()->with(["success"=>"Updated Successfully"]);
+    }
+
+
+
+    public function bill_settings(){
+        $data['title'] = 'Bill Settings';
+        $data['bill_setting'] = BillSettings::find(1);
+        return view('admin.settings.bill_settings')->with($data);
+    }
+
+    public function process_bill_settings(Request $request){
+        $obj = BillSettings::find(1);
+        $obj->company_name = $request->company_name;
+        $obj->company_address = $request->company_address;
+        $obj->company_phone = $request->company_phone;
+        $obj->gstin = $request->gstin;
+        $obj->fssai_license = $request->fssai_license;
+        $obj->is_tax_show = $request->gst_show;
+        $res = $obj->update();
+        if($res){
+            return redirect()->back()->with('success','Bill Settings Chnaged Successfully');
+        }else{
+            return redirect()->back()->with('error','Bill Settings Not Chnaged');
+        }
     }
 }

@@ -6,7 +6,8 @@ use App\Http\Controllers\{
     AuthController,
     CategoryController,
     ProductController,
-    ShopsController
+    ShopsController,
+    PDFController
 };
 
 use App\Http\Controllers\API\{
@@ -28,6 +29,8 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('/remove-cart-item/{id}', [Billing::class, 'remove_cart_item']);
     Route::get('/get-all-orders', [Billing::class, 'get_all_orders']);
     Route::get('/get-order-items/{id}', [Billing::class, 'get_order_items']);
+
+    Route::get('/get-bill/{id}', [PDFController::class, 'generatePDF']);
     
     Route::post('/logout', [AuthController::class, 'app_logout']);
 });

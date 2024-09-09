@@ -37,7 +37,7 @@
                                         <th class="text-wrap">Shop Details</th>
                                         <th class="text-wrap">Price Details</th>
                                         <th class="text-wrap">Payment</th>
-                                        <!-- <th class="text-wrap">Bill</th> -->
+                                        <th class="text-wrap">Bill</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,7 +46,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td><a href="{{ route('bills.bill-details',$bill->id) }}">{{ $bill->order_number }}</a></td>
-                                        <td>{{ get_name('salesmen',$bill->salesman_id) }}<br> at {{ format_datetime($bill->created_at) }}</td>
+                                        <td class="text-wrap">{{ get_name('salesmen',$bill->salesman_id) }}<br> at {{ format_datetime($bill->created_at) }}</td>
                                         <td>
                                             Name: {{ $shop->shop_name }}<br>
                                             Owner: {{ $shop->owner_name }}<br>
@@ -62,7 +62,7 @@
                                             Payment Mode: {{ $bill->payment_mode }}<br>
                                             Status : {{ $bill->is_paid == 1? 'Paid' : 'Unpaid' }}<br>
                                         </td>
-                                        <!-- <td></td> -->
+                                        <td><a href="{{ route('generate-pdf',$bill->id) }}" class="btn btn-info">View Bill</a></td>
                                     </tr>
                                     @endforeach
                                 </tbody>

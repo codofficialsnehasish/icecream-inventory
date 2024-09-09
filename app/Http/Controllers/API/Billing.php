@@ -237,7 +237,8 @@ class Billing extends Controller
             if($res){
                 return response()->json([
                     'status'=>'true',
-                    'massage'=>'Bill Created Successfully'
+                    'massage'=>'Bill Created Successfully',
+                    'order' => $order
                 ]);
             }else{
                 return response()->json([
