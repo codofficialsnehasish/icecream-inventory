@@ -97,6 +97,13 @@ class AuthController extends Controller
                 ]);
             }
 
+            if($user->status != 1){
+                return response()->json([
+                    'status' => 'false',
+                    'massage' => 'Not Have Permission to Login',
+                ]);
+            }
+
             $token = $user->createToken('auth-token')->plainTextToken;
 
             return response()->json(['status'=>'true','token' => $token]);

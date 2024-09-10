@@ -78,12 +78,12 @@ class DailySalesController extends Controller
             //     ];
             // }, $request->products, $request->quantity, $request->closing_stock);
 
-            $dataToStore = array_filter(array_map(function($product) {
+            $dataToStore = array_filter(array_map(function($product) {       
                 $quantity = $product['quantity'];
                 $closingStock = $product['closing_stock'] ?? 0;
                 $currentStock = $product['current_stock'];
                 if (($quantity !== null || $closingStock !== null)) {
-                    if($currentStock >= $quantity){
+                    // if($currentStock >= $quantity){
                         return [
                             'product' => $product['product_id'],
                             'category' => get_category_id_by_product_id($product['product_id']),
@@ -92,16 +92,16 @@ class DailySalesController extends Controller
                             'quantity' => $quantity + $closingStock,
                             'actual_stock' => $quantity + $closingStock,
                         ];
-                    }elseif($closingStock !== null){
-                        return [
-                            'product' => $product['product_id'],
-                            'category' => get_category_id_by_product_id($product['product_id']),
-                            'provided_qty' => null,
-                            'closing_stock' => $closingStock,
-                            'quantity' => $closingStock,
-                            'actual_stock' => $closingStock,
-                        ];
-                    }
+                    // }elseif($closingStock !== null){
+                    //     return [
+                    //         'product' => $product['product_id'],
+                    //         'category' => get_category_id_by_product_id($product['product_id']),
+                    //         'provided_qty' => null,
+                    //         'closing_stock' => $closingStock,
+                    //         'quantity' => $closingStock,
+                    //         'actual_stock' => $closingStock,
+                    //     ];
+                    // }
                 }
             }, $request->products));
 
@@ -113,12 +113,12 @@ class DailySalesController extends Controller
             
                 $currentStock = Product::where('id', $productId)->value('stock');
                 if ($currentStock !== null) {
-                    if ($quantity !== null && $currentStock >= $quantity) {
+                    // if ($quantity !== null && $currentStock >= $quantity) {
                         $newStock = $currentStock - $quantity;
                         Product::where('id', $productId)->update(['stock' => $newStock]);
-                    } elseif ($closingStock !== null) {
-                        Product::where('id', $productId)->update(['stock' => $currentStock]);
-                    }
+                    // } elseif ($closingStock !== null) {
+                    //     Product::where('id', $productId)->update(['stock' => $currentStock]);
+                    // }
                 }
             }
 

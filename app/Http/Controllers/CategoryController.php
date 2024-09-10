@@ -16,7 +16,12 @@ class CategoryController extends Controller
 
     public function index(Request $request){
         if($request->is('api/*')){
-            $dailysales_id = DailySales::where('outing_date',date('Y-m-d'))->where('salesman_id',$request->user()->id)->value('id');
+            // $dailysales_id = DailySales::where('outing_date',date('Y-m-d'))->where('salesman_id',$request->user()->id)->value('id');
+            $dailysales_id = DailySales::where('outing_date', date('Y-m-d'))
+                            ->where('salesman_id', $request->user()->id)
+                            ->latest('created_at') // Order by the latest 'created_at' timestamp
+                            ->value('id');
+                            
             if(!empty($dailysales_id)){
                 $assign_products_json = AssignedProducts::where('daily_sales',$dailysales_id)->value('products');
                 $assign_products = json_decode($assign_products_json, true);
