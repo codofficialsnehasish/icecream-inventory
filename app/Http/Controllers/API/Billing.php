@@ -298,7 +298,11 @@ class Billing extends Controller
 
     public function get_all_orders(Request $request)
     {
-        $orders = Order::where('salesman_id',$request->user()->id)->get();
+        // $orders = Order::where('salesman_id',$request->user()->id)->get();
+        $orders = Order::leftJoin('shops','orders.shop_id','shops.id')
+                    ->where('orders.salesman_id',$request->user()->id)
+                    ->orderBy('id','desc')
+                    ->get(['orders.*','shops.shop_name','shops.owner_name','shops.whatsapp_number']);
         if($orders->isNotEmpty()){
             return response()->json([
                 'status'=>'true',
@@ -313,7 +317,10 @@ class Billing extends Controller
     }
 
     public function get_order_items($id){
-        $order_items = OrderItems::where('order_id',$id)->get();
+        // $order_items = OrderItems::where('order_id',$id)->get();
+        $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
+                                    ->where('order_id',$id)
+                                    ->get(['order_items.*','products.name as product_name']);
         if($order_items->isNotEmpty()){
             return response()->json([
                 'status'=>'true',
