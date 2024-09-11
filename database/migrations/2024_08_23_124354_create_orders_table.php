@@ -22,6 +22,8 @@ return new class extends Migration
             $table->decimal('gst',10,2)->default(0.00);
             $table->decimal('grand_total',10,2)->default(0.00);
             $table->string('payment_mode')->nullable();
+            $table->decimal('cash',10,2)->default(0.00);
+            $table->decimal('online',10,2)->default(0.00);
             $table->tinyInteger('is_paid')->default(0);
             $table->timestamps();
 

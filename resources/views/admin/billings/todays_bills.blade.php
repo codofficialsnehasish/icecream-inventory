@@ -61,6 +61,10 @@
                                         <td>
                                             Payment Mode: {{ $bill->payment_mode }}<br>
                                             Status : {{ $bill->is_paid == 1? 'Paid' : 'Unpaid' }}<br>
+                                            @if($bill->payment_mode == 'Online&Cash')
+                                            Cash : {{ $bill->cash }}<br>
+                                            Online : {{ $bill->online }}<br>
+                                            @endif
                                         </td>
                                         <td><a href="{{ route('generate-pdf',$bill->id) }}" class="btn btn-info">View Bill</a></td>
                                     </tr>

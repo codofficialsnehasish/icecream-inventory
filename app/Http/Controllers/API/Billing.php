@@ -226,6 +226,10 @@ class Billing extends Controller
                             ->pluck('total_price')
                             ->first();
             $order->payment_mode = $request->payment_mode;
+            if($request->payment_mode == 'Online&Cash'){
+                $order->cash = $request->cash;
+                $order->online = $request->online;
+            }
             $order->is_paid = $request->is_paid;
     
             $res = $order->save();

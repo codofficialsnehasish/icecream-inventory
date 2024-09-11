@@ -63,7 +63,11 @@
                                         <label for="example-text-input" class="col-sm-4 col-form-label">Payment</label>
                                         <div class="col-sm-8">
                                             <strong class="font-right">
-                                                {{ ucfirst($order->payment_mode) }} ({{ $order->is_paid ? 'Paid' : 'Unpaid' }})
+                                                {{ ucfirst($order->payment_mode) }} ({{ $order->is_paid ? 'Paid' : 'Unpaid' }})<br>
+                                                @if($order->payment_mode == 'Online&Cash')
+                                                Cash : {{ $order->cash }}<br>
+                                                Online : {{ $order->online }}<br>
+                                                @endif
                                             </strong>
                                         </div>
                                     </div>
