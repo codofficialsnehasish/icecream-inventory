@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('/get-all-orders', [Billing::class, 'get_all_orders']);
     Route::get('/get-order-items/{id}', [Billing::class, 'get_order_items']);
 
-    Route::get('/get-bill/{id}', [PDFController::class, 'generatePDF']);
+    Route::get('/get-bill/{id}', [PDFController::class, 'generate_bill_url']);
     
     Route::post('/logout', [AuthController::class, 'app_logout']);
 });
