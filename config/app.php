@@ -202,6 +202,10 @@ return [
          */
         Spatie\Permission\PermissionServiceProvider::class,
 
+        /*
+         * Intervention Image 
+         */ 
+        Intervention\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -217,6 +221,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ])->toArray(),
 
 ];

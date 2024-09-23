@@ -77,10 +77,6 @@
         <p style="margin: 0;">Thank You</p>
         <p style="margin: 0;">Stay cool, and see you again soon!</p>
     </div>
-    <script>
-        window.onload = function() {
-            window.print();
-        };
-    </script>
+
 </body>
 </html>

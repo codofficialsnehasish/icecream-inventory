@@ -211,3 +211,4 @@ Route::middleware('auth')->group(function () {
 Route::get('/generate-pdf/{id?}', [PDFController::class, 'generatePDF'])->name('generate-pdf');
 Route::get('/bill/{bill_number}', [PDFController::class,'download_bill'])->name('download-bill');
 Route::get('/show-bill/{bill_number}', [PDFController::class,'download_show_bill'])->name('download-show-bill');
+Route::get('/image-bill/{bill_number}', [PDFController::class,'download_image_bill'])->name('image-bill');
