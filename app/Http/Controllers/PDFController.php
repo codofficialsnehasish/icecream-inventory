@@ -33,12 +33,54 @@ class PDFController extends Controller
         }
     }
 
+    // public function generate_bill_url($id){
+    //     $order = Order::find($id);
+    //     $url = route('download-bill',$order->order_number);
+    //     // $url = route('download-show-bill',$order->order_number);
+    //     // $url = route('image-bill',$order->order_number);
+    //     return ["status"=>"true","data"=>$url];
+    // }
+
     public function generate_bill_url($id){
         $order = Order::find($id);
-        $url = route('download-bill',$order->order_number);
-        // $url = route('download-show-bill',$order->order_number);
-        // $url = route('image-bill',$order->order_number);
-        return ["status"=>"true","data"=>$url];
+        if($order){
+            $url = route('download-bill',$order->order_number);
+            $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
+            ->where('order_items.order_id',$order->id)
+            ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+
+            $customer_details = Shops::find($order->shop_id);
+            $bill_settings = BillSettings::find(1);
+
+            $html = view('admin.billings.bill', compact('order', 'order_items', 'customer_details', 'bill_settings'))->render();
+            $pdf = PDF::loadHTML($html)->setPaper([0, 0, 144, 288])->set_option('isHtml5ParserEnabled', true);
+
+            $filename = 'bill.pdf';
+            $path = public_path('pdfs/' . $filename); // Change 'pdfs/' to your desired folder
+
+            // Ensure the directory exists
+            if (!file_exists(public_path('pdfs'))) {
+            mkdir(public_path('pdfs'), 0755, true);
+            }
+
+            // Save the PDF to the specified path
+            $pdf->save($path);
+
+            // Get the URL to the saved PDF
+            $pdfUrl = asset('pdfs/' . $filename);
+
+            // Return or use the link as needed
+            return response()->json([
+                // 'pdf_link' => $pdfUrl,
+                'pdf_link' => $url,
+                'bill_html' => $html,
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'false',
+                'massage' => 'Order Not Found',
+            ]);
+        }
     }
 
     public function download_bill($bill_number){
@@ -52,25 +94,27 @@ class PDFController extends Controller
         $html = view('admin.billings.bill', compact('order', 'order_items', 'customer_details', 'bill_settings'))->render();
         $pdf = PDF::loadHTML($html)->setPaper([0, 0, 144, 288])->set_option('isHtml5ParserEnabled', true);
 
-        $filename = 'bill.pdf';
-        $path = public_path('pdfs/' . $filename); // Change 'pdfs/' to your desired folder
+        $filename = $order->order_number . '.pdf';
+        return $pdf->stream($filename);
+        // $filename = 'bill.pdf';
+        // $path = public_path('pdfs/' . $filename); // Change 'pdfs/' to your desired folder
 
-        // Ensure the directory exists
-        if (!file_exists(public_path('pdfs'))) {
-            mkdir(public_path('pdfs'), 0755, true);
-        }
+        // // Ensure the directory exists
+        // if (!file_exists(public_path('pdfs'))) {
+        //     mkdir(public_path('pdfs'), 0755, true);
+        // }
 
-        // Save the PDF to the specified path
-        $pdf->save($path);
+        // // Save the PDF to the specified path
+        // $pdf->save($path);
 
-        // Get the URL to the saved PDF
-        $pdfUrl = asset('pdfs/' . $filename);
+        // // Get the URL to the saved PDF
+        // $pdfUrl = asset('pdfs/' . $filename);
 
-        // Return or use the link as needed
-        return response()->json([
-            'pdf_link' => $pdfUrl,
-            'pdf_html' => $html,
-        ]);
+        // // Return or use the link as needed
+        // return response()->json([
+        //     'pdf_link' => $pdfUrl,
+        //     'pdf_html' => $html,
+        // ]);
     }
 
 
