@@ -21,13 +21,13 @@ class PDFController extends Controller
             $order = Order::find($id);
             $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
                             ->where('order_items.order_id',$order->id)
-                            ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+                            ->get(['order_items.*','products.name','products.price','products.box_quantity','products.product_type']);
             $customer_details = Shops::find($order->shop_id);
             $bill_settings = BillSettings::find(1);
 
             $html = view('admin.billings.bill', compact('order', 'order_items', 'customer_details', 'bill_settings'))->render();
             $pdf = PDF::loadHTML($html)->setPaper([0, 0, 144, 288])->set_option('isHtml5ParserEnabled', true);
-    
+            // return $order_items;
             $filename = $order->order_number . '.pdf';
             return $pdf->stream($filename);
         }
@@ -45,9 +45,12 @@ class PDFController extends Controller
         $order = Order::find($id);
         if($order){
             $url = route('download-bill',$order->order_number);
+            // $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
+            // ->where('order_items.order_id',$order->id)
+            // ->get(['order_items.*','products.name','products.price','products.box_quantity']);
             $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
-            ->where('order_items.order_id',$order->id)
-            ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+                            ->where('order_items.order_id',$order->id)
+                            ->get(['order_items.*','products.name','products.price','products.box_quantity','products.product_type']);
 
             $customer_details = Shops::find($order->shop_id);
             $bill_settings = BillSettings::find(1);
@@ -73,7 +76,28 @@ class PDFController extends Controller
             return response()->json([
                 // 'pdf_link' => $pdfUrl,
                 'pdf_link' => $url,
-                'bill_html' => $html,
+                // 'bill_html' => json_encode($html),
+                'bill_data' => [
+                    'company_name' => $bill_settings->company_name,
+                    'company_address' => $bill_settings->company_address,
+                    'company_phone' => $bill_settings->company_phone,
+                    'gstin' => $bill_settings->gstin,
+                    'fssai_license' => $bill_settings->fssai_license,
+                    'customer_details' =>[
+                        'shop_name' =>$customer_details->shop_name,
+                        'owner_name' => $customer_details->owner_name,
+                        'whatsapp_number' => $customer_details->whatsapp_number,
+                        'address' => $customer_details->address
+                    ],
+                    'order_number' => '#'.$order->order_number,
+                    'date' => format_datetime($order->created_at),
+                    'order_items' => $order_items,
+                    'subtotal' => $order->sub_total,
+                    'discount' => $order->discount,
+                    'is_tax_show' => $bill_settings->is_tax_show,
+                    'gst' => $order->gst,
+                    'total' => $order->grand_total
+                ]
             ]);
         }else{
             return response()->json([
@@ -87,7 +111,7 @@ class PDFController extends Controller
         $order = Order::where('order_number',$bill_number)->first();
         $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
                         ->where('order_items.order_id',$order->id)
-                        ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+                        ->get(['order_items.*','products.name','products.price','products.box_quantity','products.product_type']);
         $customer_details = Shops::find($order->shop_id);
         $bill_settings = BillSettings::find(1);
 
@@ -125,7 +149,7 @@ class PDFController extends Controller
         }
         $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
                         ->where('order_items.order_id',$order->id)
-                        ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+                        ->get(['order_items.*','products.name','products.price','products.box_quantity','products.product_type']);
         $customer_details = Shops::find($order->shop_id);
         $bill_settings = BillSettings::find(1);
 
@@ -147,7 +171,7 @@ class PDFController extends Controller
         $order = Order::where('order_number',$bill_number)->first();
         $order_items = OrderItems::leftJoin('products','order_items.product_id','products.id')
                         ->where('order_items.order_id',$order->id)
-                        ->get(['order_items.*','products.name','products.price','products.box_quantity']);
+                        ->get(['order_items.*','products.name','products.price','products.box_quantity','products.product_type']);
         $customer_details = Shops::find($order->shop_id);
         $bill_settings = BillSettings::find(1);
 

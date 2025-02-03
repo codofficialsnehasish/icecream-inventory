@@ -90,6 +90,66 @@
                                     </a>
                                 </div>
                             </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card mini-stat bg-primary text-white">
+                                    <a href="{{ route('bills.todays-bill') }}">
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <div class="float-start mini-stat-img me-4">
+                                                    <img src="{{ asset('dashboard_assets/images/services-icon/29.png') }}" alt="">
+                                                </div>
+                                                <h5 class="font-size-16 text-uppercase text-white-50">Todays Online Sell</h5>
+                                                <h4 class="fw-medium font-size-24" style="color:white;">{{ $todays_online_sell }}</h4>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card mini-stat bg-primary text-white">
+                                    <a href="{{ route('bills.todays-bill') }}">
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <div class="float-start mini-stat-img me-4">
+                                                    <img src="{{ asset('dashboard_assets/images/services-icon/30.png') }}" alt="">
+                                                </div>
+                                                <h5 class="font-size-16 text-uppercase text-white-50">Todays Cash Sell</h5>
+                                                <h4 class="fw-medium font-size-24" style="color:white;">{{ $todays_cash_sell }}</h4>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card mini-stat bg-primary text-white">
+                                    <a href="{{ route('bills.todays-bill') }}">
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <div class="float-start mini-stat-img me-4">
+                                                    <img src="{{ asset('dashboard_assets/images/services-icon/28.png') }}" alt="">
+                                                </div>
+                                                <h5 class="font-size-16 text-uppercase text-white-50">Todays Expences</h5>
+                                                <h4 class="fw-medium font-size-24" style="color:white;">{{ $todays_expences }}</h4>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card mini-stat bg-primary text-white">
+                                    <a href="{{ route('bills.todays-bill') }}">
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <div class="float-start mini-stat-img me-4">
+                                                    <img src="{{ asset('dashboard_assets/images/services-icon/27.png') }}" alt="">
+                                                </div>
+                                                <h5 class="font-size-16 text-uppercase text-white-50">Todays Cash In Hand</h5>
+                                                <h4 class="fw-medium font-size-24" style="color:white;">{{ $cash_in_hand }}</h4>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">

@@ -12,9 +12,130 @@ use App\Models\Salesman;
 use App\Models\Trucks;
 use App\Models\Accounts;
 use App\Models\AccountsController2;
+use App\Models\Expence;
+use Illuminate\Support\Facades\DB;
 
 class Report_Controller extends Controller
 {    
+    public function sell_report(){
+        $title = "Sell Report";
+
+        $trucks = Trucks::all();
+        $salesmans = Salesman::all();
+        $payments_methods = Order::select('payment_mode')->distinct()->pluck('payment_mode');
+
+        $sells = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                    ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                    ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                    ->get(['orders.*', 't.name as truck_name']);
+        
+        $data['expence'] = Expence::sum('amount');
+        $payment_mode = '';
+        $data['online_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Online')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Online" THEN grand_total ELSE online END'));
+
+        $data['cash_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Cash')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Cash" THEN grand_total ELSE cash END'));
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
+
+        return view('admin.reports.cash_online_sale_report',compact('trucks','sells','salesmans','title','payments_methods','payment_mode'))->with($data);
+    }
+
+    public function generate_sales_report(Request $request){
+        $title = 'Sales Report';
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $salesman_id = $request->salesman_id;
+
+        $payments_methods = Order::select('payment_mode')->distinct()->pluck('payment_mode');
+
+        $sells = Order::query()
+                        ->select(['orders.*', 't.name as truck_name'])
+                        ->distinct()
+                        ->leftJoin('daily_sales as d', 'orders.salesman_id', '=', 'd.salesman_id')
+                        ->leftJoin('trucks as t', 'd.truck_id', '=', 't.id')
+                        ->when(!empty($request->salesmen_id), function ($query) use ($request) {
+                            $query->where('orders.salesman_id', $request->salesmen_id);
+                        })
+                        ->when(!empty($request->trucks_id), function ($query) use ($request) {
+                            $query->where('t.id', $request->trucks_id);
+                        })
+                        ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                            $query->whereDate('orders.created_at', '>=', $startDate)
+                                ->whereDate('orders.created_at', '<=', $endDate);
+                        })
+                        // ->when(!empty($request->payment_mode), function ($query) use ($request) {
+                        //     $query->where('orders.payment_mode', $request->payment_mode);
+                        // })
+                        ->when(!empty($request->payment_mode), function ($query) use ($request) {
+                            if ($request->payment_mode === 'Cash') {
+                                $query->where(function ($query) {
+                                    $query->where('orders.payment_mode', 'Cash')
+                                        ->orWhere('orders.payment_mode', 'Online&Cash');
+                                });
+                            } elseif ($request->payment_mode === 'Online') {
+                                $query->where(function ($query) {
+                                    $query->where('orders.payment_mode', 'Online')
+                                        ->orWhere('orders.payment_mode', 'Online&Cash');
+                                });
+                            } else {
+                                $query->where('orders.payment_mode', $request->payment_mode);
+                            }
+                        })
+                        ->get();
+    
+    
+        $payment_mode = $request->payment_mode;
+
+        $trucks = Trucks::all();
+        $salesmans = Salesman::all();
+        $data['expence'] = Expence::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesmen_id', $salesman_id);
+                                })
+                                ->whereBetween('created_at', [$startDate, $endDate])
+                                ->sum('amount');
+
+        $data['online_sell'] = Order::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesman_id', $salesman_id);
+                                })
+                                ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                                })
+                                ->where(function ($query) {
+                                    $query->where('payment_mode', 'Online')
+                                          ->orWhere('payment_mode', 'Online&Cash');
+                                })
+                                ->sum(DB::raw('CASE WHEN payment_mode = "Online" THEN grand_total ELSE online END'));
+                            
+        $data['cash_sell'] = Order::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesman_id', $salesman_id);
+                                })
+                                ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                                })
+                                ->where(function ($query) {
+                                    $query->where('payment_mode', 'Cash')
+                                          ->orWhere('payment_mode', 'Online&Cash');
+                                })
+                                ->sum(DB::raw('CASE WHEN payment_mode = "Cash" THEN grand_total ELSE cash END'));
+                            
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
+
+        return view('admin.reports.cash_online_sale_report',compact('trucks','sells','salesmans','title','payments_methods','payment_mode'))->with($data);
+    }
+
     public function dealer_wise_sales_report(){
         $data['title'] = 'Dealer Wise Sales Report';
         $data['items'] = Order::all();
@@ -52,8 +173,29 @@ class Report_Controller extends Controller
 
     public function salesman_wise_sales_report(){
         $data['title'] = 'Salesman Wise Sales Report';
-        $data['items'] = Order::all();
+        // $data['items'] = Order::all();
+        $data['items'] = Order::selectRaw('salesman_id, DATE(created_at) as order_date, SUM(grand_total) as total_grand_total')
+                            ->groupBy('salesman_id', DB::raw('DATE(created_at)'))
+                            ->get();
+
         $data['salesmans'] = Salesman::all();
+
+        $data['expence'] = Expence::sum('amount');
+
+        $data['online_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Online')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Online" THEN grand_total ELSE online END'));
+
+        $data['cash_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Cash')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Cash" THEN grand_total ELSE cash END'));
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
+
         return view('admin.reports.salesman_wise_sales_report')->with($data);
     }
 
@@ -61,21 +203,56 @@ class Report_Controller extends Controller
         $data['title'] = 'Salesman Wise Sales Report';
         $startDate = $r->start_date;
         $endDate = $r->end_date;
-        if(!empty($r->salesman_id) && !empty($startDate) && !empty($endDate)){
-            $data['items'] = Order::whereDate('created_at', '>=', $startDate)
-                            ->whereDate('created_at', '<=', $endDate)
-                            ->where('salesman_id',$r->salesman_id)
+        $salesman_id = $r->salesman_id;
+
+        $data['items'] = Order::selectRaw('salesman_id, DATE(created_at) as order_date, SUM(grand_total) as total_grand_total')
+                            ->when(!empty($r->salesman_id), function ($query) use ($r) {
+                                $query->where('salesman_id', $r->salesman_id);
+                            })
+                            ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                $query->whereDate('created_at', '>=', $startDate)
+                                    ->whereDate('created_at', '<=', $endDate);
+                            })
+                            ->groupBy('salesman_id', DB::raw('DATE(created_at)'))
                             ->get();
-        }else{
-            if(!empty($r->salesman_id)){
-                $data['items'] = Order::where('salesman_id',$r->salesman_id)->get();
-            }elseif(!empty($startDate) && !empty($endDate)){
-                $data['items'] = Order::whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate)
-                ->get();
-            }
-        }
+
+
         $data['salesmans'] = Salesman::all();
+        $data['expence'] = Expence::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesmen_id', $salesman_id);
+                                })
+                                ->whereBetween('created_at', [$startDate, $endDate])
+                                ->sum('amount');
+
+        $data['online_sell'] = Order::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesman_id', $salesman_id);
+                                })
+                                ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                                })
+                                ->where(function ($query) {
+                                    $query->where('payment_mode', 'Online')
+                                          ->orWhere('payment_mode', 'Online&Cash');
+                                })
+                                ->sum(DB::raw('CASE WHEN payment_mode = "Online" THEN grand_total ELSE online END'));
+                            
+        $data['cash_sell'] = Order::query()
+                                ->when(!empty($salesman_id), function ($query) use ($salesman_id) {
+                                    $query->where('salesman_id', $salesman_id);
+                                })
+                                ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                                })
+                                ->where(function ($query) {
+                                    $query->where('payment_mode', 'Cash')
+                                          ->orWhere('payment_mode', 'Online&Cash');
+                                })
+                                ->sum(DB::raw('CASE WHEN payment_mode = "Cash" THEN grand_total ELSE cash END'));
+                            
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
         return view('admin.reports.salesman_wise_sales_report')->with($data);
     }
 
@@ -84,9 +261,25 @@ class Report_Controller extends Controller
         $data['items'] = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
                         ->leftJoin('trucks as t', 'd.truck_id', 't.id')
                         ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                        ->distinct()
                         ->get(['orders.*', 't.name as truck_name']);
         
         $data['trucks'] = Trucks::where('is_visible',1)->get();
+        $data['expence'] = Expence::sum('amount');
+
+        $data['online_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Online')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Online" THEN grand_total ELSE online END'));
+
+        $data['cash_sell'] = Order::where(function($query) {
+                                        $query->where('payment_mode', 'Cash')
+                                            ->orWhere('payment_mode', 'Online&Cash');
+                                    })
+                                    ->sum(DB::raw('CASE WHEN payment_mode = "Cash" THEN grand_total ELSE cash END'));
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
         return view('admin.reports.trucks_wise_sales_report')->with($data);
     }
 
@@ -94,33 +287,118 @@ class Report_Controller extends Controller
         $data['title'] = 'Trucks Wise Sales Report';
         $startDate = $r->start_date;
         $endDate = $r->end_date;
+        $truck_id = $r->trucks_id;
+
         if(!empty($r->trucks_id) && !empty($startDate) && !empty($endDate)){
             $data['items'] = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
                             ->leftJoin('trucks as t', 'd.truck_id', 't.id')
                             ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
-                            ->where('t.id',$r->trucks_id)
+                            ->where('t.id', $r->trucks_id)
                             ->whereDate('orders.created_at', '>=', $startDate)
                             ->whereDate('orders.created_at', '<=', $endDate)
+                            ->distinct()
                             ->get(['orders.*', 't.name as truck_name']);
+
+            $onlineSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                            ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                            ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                            ->where('t.id', $r->trucks_id)
+                            ->whereDate('orders.created_at', '>=', $startDate)
+                            ->whereDate('orders.created_at', '<=', $endDate)
+                            ->distinct()
+                            ->select(
+                                DB::raw('SUM(CASE WHEN orders.payment_mode = "Online" THEN orders.grand_total ELSE orders.online END) as online_sell')
+                            )
+                            ->first();
+
+            $cashSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                            ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                            ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                            ->where('t.id', $r->trucks_id)
+                            ->whereDate('orders.created_at', '>=', $startDate)
+                            ->whereDate('orders.created_at', '<=', $endDate)
+                            ->distinct()
+                            ->select(
+                                DB::raw('SUM(CASE WHEN orders.payment_mode = "Cash" THEN orders.grand_total ELSE orders.cash END) as cash_sell')
+                            )
+                            ->first();
         }else{
             if(!empty($r->trucks_id)){
                 $data['items'] = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
                                 ->leftJoin('trucks as t', 'd.truck_id', 't.id')
                                 ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
                                 ->where('t.id',$r->trucks_id)
+                                ->distinct()
                                 ->get(['orders.*', 't.name as truck_name']);
+
+                $onlineSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                                ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                                ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                                ->where('t.id', $r->trucks_id)
+                                ->groupBy('orders.id')
+                                ->select(
+                                    DB::raw('SUM(CASE WHEN orders.payment_mode = "Online" THEN orders.grand_total ELSE orders.online END) as online_sell')
+                                )
+                                ->first();
+    
+                $cashSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                                ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                                ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                                ->where('t.id', $r->trucks_id)
+                                ->distinct()
+                                ->select(
+                                    DB::raw('SUM(CASE WHEN orders.payment_mode = "Cash" THEN orders.grand_total ELSE orders.cash END) as cash_sell')
+                                )
+                                ->first();
             }elseif(!empty($startDate) && !empty($endDate)){
                 $data['items'] = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
                                 ->leftJoin('trucks as t', 'd.truck_id', 't.id')
                                 ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
                                 ->whereDate('orders.created_at', '>=', $startDate)
                                 ->whereDate('orders.created_at', '<=', $endDate)
+                                ->distinct()
                                 ->get(['orders.*', 't.name as truck_name']);
+
+                $onlineSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                                ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                                ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                                ->whereDate('orders.created_at', '>=', $startDate)
+                                ->whereDate('orders.created_at', '<=', $endDate)
+                                ->distinct()
+                                ->select(
+                                    DB::raw('SUM(CASE WHEN orders.payment_mode = "Online" THEN orders.grand_total ELSE orders.online END) as online_sell')
+                                )
+                                ->first();
+    
+                $cashSell = Order::leftJoin('daily_sales as d', 'orders.salesman_id', 'd.salesman_id')
+                                ->leftJoin('trucks as t', 'd.truck_id', 't.id')
+                                ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                                ->whereDate('orders.created_at', '>=', $startDate)
+                                ->whereDate('orders.created_at', '<=', $endDate)
+                                ->distinct()
+                                ->select(
+                                    DB::raw('SUM(CASE WHEN orders.payment_mode = "Cash" THEN orders.grand_total ELSE orders.cash END) as cash_sell')
+                                )
+                                ->first();
             }
         }
         $data['trucks'] = Trucks::where('is_visible',1)->get();
+        $data['expence'] = Expence::query()
+                                ->when(!empty($truck_id), function ($query) use ($truck_id) {
+                                    $query->where('trucks_id', $truck_id);
+                                })
+                                ->whereBetween('created_at', [$startDate, $endDate])
+                                ->sum('amount');
+                            
+        
+        $data['online_sell'] = $onlineSell->online_sell;
+        $data['cash_sell'] = $cashSell->cash_sell;
+                            
+
+        $data['cash_in_hand'] = $data['cash_sell'] - $data['expence'];
         return view('admin.reports.trucks_wise_sales_report')->with($data);
     }
+
 
     public function account_report(){
         $data['title'] = 'Accounts Report 1';

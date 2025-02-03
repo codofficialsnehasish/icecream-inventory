@@ -13,7 +13,7 @@ class Product extends Model
 
     public function variations()
     {
-        // return $this->hasMany(ProductVariation::class);
-        return $this->hasMany(Variation::class);
+        return $this->hasMany(ProductVariation::class, 'product_id');
+        // return $this->hasMany(Variation::class);
     }
 }

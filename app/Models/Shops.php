@@ -11,6 +11,6 @@ class Shops extends Model
 
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class,'shop_id');
     }
 }

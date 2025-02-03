@@ -28,7 +28,7 @@ class ProductController extends Controller
     }
 
     public function get_products_by_category_id(Request $request){
-        $dailysales_id = DailySales::where('outing_date',date('Y-m-d'))->where('salesman_id',$request->user()->id)->value('id');
+        $dailysales_id = DailySales::where('outing_date',date('Y-m-d'))->where('salesman_id',$request->user()->id)->latest()->value('id');
         $assign_products_json = AssignedProducts::where('daily_sales',$dailysales_id)->value('products');
         $assign_products = json_decode($assign_products_json, true);
         $product_ids = array_column($assign_products, 'product');
@@ -42,11 +42,12 @@ class ProductController extends Controller
             return [
                 'product_id' => $product->id,
                 "name" => $product->name,
+                "product_type" => $product->product_type,
                 "total_price" => $product->total_price,
                 "box_quantity" => $product->box_quantity,
                 "product_main_image" => $product->product_main_image,
                 "quantity" => $product->quantity,
-                // "variations" => get_product_variations($product->id)
+                "variations" => $product->variations
             ];
         });
         return response()->json($products_with_quantity);
@@ -75,9 +76,11 @@ class ProductController extends Controller
             'product_name' => 'required|string|max:255',
             'product_billing_name' => 'required',
             'category_id' => 'required',
+            'product_type' => 'required|in:simple,attribute',
         ]);
         $product = new Product();
         $product->name = $request->product_name;
+        $product->product_type = $request->product_type;
         $product->billing_name = $request->product_billing_name;
         $product->slug = createSlug($request->product_name, Product::class);
         $product->category = $request->category_id;
@@ -112,6 +115,7 @@ class ProductController extends Controller
             $product->slug = createSlug($request->product_name, Product::class);
         }
         $product->billing_name = $request->product_billing_name;
+        $product->product_type = $request->product_type;
         $product->category = $request->category_id;
         $product->description = $request->description;
         $product->visibility = $request->is_visible;
@@ -134,21 +138,25 @@ class ProductController extends Controller
 
     public function price_edit_process(Request $request){
         $product = Product::find($request->product_id);
-        $product->price = $request->product_price;
-        $product->discount_rate = $request->discount_rate;
-        // $product->discounted_price = $request->product_price - (($request->discount_rate / 100) * $request->product_price);
-        $product->gst_rate = $request->gst_rate;
-        $product->total_price = $request->total_price;
-        // $product->gst_amount = ($request->gst_rate / 100) * $product->discounted_price;
-        $product->discount_price = ($request->discount_rate / 100) * $request->product_price;
-        $gstRate = $request->gst_rate/100;
-        $product->gst_amount = ($request->total_price * $gstRate) / (1 + $gstRate);
-        $product->product_price = $request->total_price - $product->gst_amount;
-        $res = $product->update();
-        if($res){
-            return redirect(route('products.inventory-edit',$product->id))->with(['success'=>'Price Details Updated Successfully']);
+        if($product->product_type == 'simple'){
+            $product->price = $request->product_price;
+            $product->discount_rate = $request->discount_rate;
+            // $product->discounted_price = $request->product_price - (($request->discount_rate / 100) * $request->product_price);
+            $product->gst_rate = $request->gst_rate;
+            $product->total_price = $request->total_price;
+            // $product->gst_amount = ($request->gst_rate / 100) * $product->discounted_price;
+            $product->discount_price = ($request->discount_rate / 100) * $request->product_price;
+            $gstRate = $request->gst_rate/100;
+            $product->gst_amount = ($request->total_price * $gstRate) / (1 + $gstRate);
+            $product->product_price = $request->total_price - $product->gst_amount;
+            $res = $product->update();
+            if($res){
+                return redirect(route('products.inventory-edit',$product->id))->with(['success'=>'Price Details Updated Successfully']);
+            }else{
+                return redirect()->back()->with(['error'=>'Some error occurs!']);
+            }
         }else{
-            return redirect()->back()->with(['error'=>'Some error occurs!']);
+            return redirect(route('products.inventory-edit',$product->id))->with(['success'=>'Price Details Updated Successfully']);
         }
     }
 
@@ -186,9 +194,25 @@ class ProductController extends Controller
     }
 
     public function variation_edit_process(Request $request){ 
-        $res = 1;
+        // $res = 1;
+        $variation = new ProductVariation();
+        $variation->product_id = $request->product_id;
+        $variation->lable_name = $request->label_name;
+        $variation->price = $request->product_price;
+        $variation->discount_rate = $request->discount_rate ?? 0.00;
+        // $product->discounted_price = $request->product_price - (($request->discount_rate / 100) * $request->product_price);
+        $variation->gst_rate = $request->gst_rate ?? 0.00;
+        $variation->total_price = $request->total_price;
+        // $product->gst_amount = ($request->gst_rate / 100) * $product->discounted_price;
+        $variation->discount_price = ($request->discount_rate / 100) * $request->product_price;
+        $gstRate = $request->gst_rate/100;
+        $variation->gst_amount = ($request->total_price * $gstRate) / (1 + $gstRate);
+        $variation->product_price = $request->total_price - $variation->gst_amount;
+        $variation->is_visible = $request->is_visible ?? 1;
+        $res = $variation->save();
         if($res){
-            return redirect(route('products.product-images-edit',$request->product_id));
+            // return redirect(route('products.inventory-edit',$request->product_id));
+            return redirect()->back()->with(['success'=>'Attribute Added Successfully']);
         }else{
             return redirect()->back()->with(['error'=>'Some error occurs!']);
         }
@@ -316,8 +340,8 @@ class ProductController extends Controller
     }
 
     public function delete_variation(Request $request){
-        // $variation = ProductVariation::find($request->id);
-        $variation = Variation::find($request->id);
+        $variation = ProductVariation::find($request->id);
+        // $variation = Variation::find($request->id);
         $res = $variation->delete();
         if($res){
             return redirect()->back()->with(['success'=>'Deleted Successfully']);

@@ -128,7 +128,8 @@
                                 <tbody>
                                     @foreach ($order_items as $item)
                                     <tr>
-                                        <td>{{ $item->product_name }}</td>
+                                        {{-- <td>{{ $item->product_name }}</td> --}}
+                                        <td>{{ $item->product_billing_name }}</td>
                                         <td>{{ $item->mrp }}</td>
                                         <td>{{ $item->discount }}</td>
                                         <td>{{ $item->gst }}</td>

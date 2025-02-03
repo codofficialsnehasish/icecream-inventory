@@ -89,7 +89,14 @@
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td><b>Total Amount - {{ $amount }}</b></td>
+                                        <td>
+                                            <b>Total Amount : {{ $amount }}</b><br>
+                                            <b>Total Expences : {{ $expence }}</b><br>
+                                            <b>Total Online : {{ $online_sell }}</b><br>
+                                            <b>Total Cash : {{ $cash_sell }}</b><br>
+                                            <hr>
+                                            <b>Total Cash in Hand : {{ $cash_in_hand }}</b>
+                                        </td>
                                     </tr>
                                 </tfoot>
                             </table>

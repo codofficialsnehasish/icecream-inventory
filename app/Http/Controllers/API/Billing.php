@@ -13,6 +13,7 @@ use App\Models\AssignedProducts;
 use App\Models\DailySales;
 use Illuminate\Http\Request;
 use App\Models\Variation;
+use App\Models\ProductVariation;
 use App\Models\Shops;
 use App\Models\Order;
 use App\Models\OrderItems;
@@ -26,6 +27,7 @@ class Billing extends Controller
 
         $daily_sales = DailySales::where('salesman_id',$salesman_id)
                                 ->where('outing_date',date('Y-m-d'))
+                                ->latest()
                                 ->first();
 
         if (!$daily_sales) { return false; }
@@ -47,7 +49,7 @@ class Billing extends Controller
     public function add_to_billing_cart(Request $request){
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|numeric|exists:products,id',
-            'variation_id' => 'nullable|numeric|exists:variations,id',
+            'variation_id' => 'nullable|numeric|exists:product_variations,id',
             'quantity' => 'required|numeric|min:1',
         ]);
         if ($validator->fails()) {
@@ -63,16 +65,21 @@ class Billing extends Controller
                 if($this->is_assign_product_stock_avaliable($request->product_id,$request->user()->id,$request->quantity)){
                     $cart->quantity += $request->quantity;
                     $res = $cart->update();
+
                     $product = Product::find($request->product_id);
+                    $product_variation = ProductVariation::find($request->variation_id);
+
+                    $msg = $product->name;
+                    if($product_variation){ $msg .= ' ( '.$product_variation->lable_name.' )'; }
                     if($res){
                         return response()->json([
                             'status'=>'true',
-                            'massage'=>$product->name.' updated to bill successfully'
+                            'massage'=>$msg.' updated to bill successfully'
                         ]);
                     }else{
                         return response()->json([
                             'status'=>'false',
-                            'massage'=>$product->name.' not updated to bill'
+                            'massage'=>$msg.' not updated to bill'
                         ]);
                     }
                 }else{
@@ -84,6 +91,7 @@ class Billing extends Controller
             }else{
                 if($this->is_assign_product_stock_avaliable($request->product_id,$request->user()->id,$request->quantity)){
                     $product = Product::find($request->product_id);
+                    $product_variation = ProductVariation::find($request->variation_id);
                     $cart = new BillingCart();
                     $cart->salesmen_id = $request->user()->id;
                     $cart->product_id = $request->product_id;
@@ -92,15 +100,18 @@ class Billing extends Controller
                     $cart->variation_id = $request->variation_id;
                     $cart->quantity = $request->quantity;
                     $res = $cart->save();
+
+                    $msg = $product->name;
+                    if($product_variation){ $msg .= ' ( '.$product_variation->lable_name.' )'; }
                     if($res){
                         return response()->json([
                             'status'=>'true',
-                            'massage'=>$product->name.' added to bill successfully'
+                            'massage'=>$msg.' added to bill successfully'
                         ]);
                     }else{
                         return response()->json([
                             'status'=>'false',
-                            'massage'=>$product->name.' not added to bill'
+                            'massage'=>$msg.' not added to bill'
                         ]);
                     }
                 }else{
@@ -119,15 +130,15 @@ class Billing extends Controller
                             ->get()
                             ->map(function($item){
                                 $item->product = Product::find($item->product_id);
-                                $item->variation = Variation::find($item->variation_id);
+                                $item->variation = ProductVariation::find($item->variation_id);
                                 return $item;
                             });
         $total_amount = BillingCart::leftJoin('products', 'billing_carts.product_id', '=', 'products.id')
-                        ->leftJoin('variations', 'billing_carts.variation_id', '=', 'variations.id')
+                        ->leftJoin('product_variations', 'billing_carts.variation_id', '=', 'product_variations.id')
                         ->where('billing_carts.salesmen_id', $request->user()->id)
                         ->selectRaw('SUM(
                             CASE 
-                                WHEN billing_carts.variation_id IS NOT NULL THEN variations.price * products.box_quantity * billing_carts.quantity
+                                WHEN billing_carts.variation_id IS NOT NULL THEN product_variations.total_price * products.box_quantity * billing_carts.quantity
                                 ELSE products.total_price * products.box_quantity * billing_carts.quantity
                             END
                         ) as total_price')
@@ -164,6 +175,40 @@ class Billing extends Controller
         }
     }
 
+    public function decrese_cart_item_quantity(Request $request){
+        // return $request->all();
+        $cart = BillingCart::where('product_id',$request->product_id)->where('salesmen_id',$request->user()->id)->latest()->first();
+        if($cart){
+            if($request->decrement_quantity != null){
+                // return 'not null';
+                $cart->quantity = max(0, $cart->quantity - $request->decrement_quantity);
+                if($cart->update()){
+                    return response()->json([
+                        'status'=>'true',
+                        'massage'=>'Item Decremented Successfully'
+                    ]);
+                }else{
+                    return response()->json([
+                        'status'=>'false',
+                        'massage'=>'Item Not Decremented'
+                    ]);
+                }
+            }else{
+                return response()->json([
+                    'status'=>'false',
+                    'massage'=>'Please provide decrement quantity'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'status'=>'false',
+                'massage'=>'This Product Not found in your cart'
+            ]);
+        }
+    }
+
+    
+
     public function get_all_shops(){
         $shops = Shops::where('is_visible',1)->get();
         if($shops->isNotEmpty()){
@@ -191,22 +236,22 @@ class Billing extends Controller
             $order->shop_id = $request->shop_id;
             $order->total_product_count = BillingCart::where('salesmen_id',$request->user()->id)->sum('quantity');
             $order->sub_total = BillingCart::leftJoin('products', 'billing_carts.product_id', '=', 'products.id')
-                                ->leftJoin('variations', 'billing_carts.variation_id', '=', 'variations.id')
+                                ->leftJoin('product_variations', 'billing_carts.variation_id', '=', 'product_variations.id')
                                 ->where('billing_carts.salesmen_id', $request->user()->id)
                                 ->selectRaw('SUM(
                                     CASE 
-                                        WHEN billing_carts.variation_id IS NOT NULL THEN variations.price * products.box_quantity * billing_carts.quantity
+                                        WHEN billing_carts.variation_id IS NOT NULL THEN product_variations.price * products.box_quantity * billing_carts.quantity
                                         ELSE products.price * products.box_quantity * billing_carts.quantity
                                     END
                                 ) as total_amount')
                                 ->pluck('total_amount')
                                 ->first();
             $order->grand_total = BillingCart::leftJoin('products', 'billing_carts.product_id', '=', 'products.id')
-                                ->leftJoin('variations', 'billing_carts.variation_id', '=', 'variations.id')
+                                ->leftJoin('product_variations', 'billing_carts.variation_id', '=', 'product_variations.id')
                                 ->where('billing_carts.salesmen_id', $request->user()->id)
                                 ->selectRaw('SUM(
                                     CASE 
-                                        WHEN billing_carts.variation_id IS NOT NULL THEN variations.price * products.box_quantity * billing_carts.quantity
+                                        WHEN billing_carts.variation_id IS NOT NULL THEN product_variations.total_price * products.box_quantity * billing_carts.quantity
                                         ELSE products.total_price * products.box_quantity * billing_carts.quantity
                                     END
                                 ) as total_price')
@@ -215,11 +260,11 @@ class Billing extends Controller
             // return abs($order->sub_total - $order->grand_total);
             $order->discount = abs($order->sub_total - $order->grand_total);
             $order->gst = BillingCart::leftJoin('products', 'billing_carts.product_id', '=', 'products.id')
-                            ->leftJoin('variations', 'billing_carts.variation_id', '=', 'variations.id')
+                            ->leftJoin('product_variations', 'billing_carts.variation_id', '=', 'product_variations.id')
                             ->where('billing_carts.salesmen_id', $request->user()->id)
                             ->selectRaw('SUM(
                                 CASE 
-                                    WHEN billing_carts.variation_id IS NOT NULL THEN variations.price * products.box_quantity * billing_carts.quantity
+                                    WHEN billing_carts.variation_id IS NOT NULL THEN product_variations.gst_amount * products.box_quantity * billing_carts.quantity
                                     ELSE products.gst_amount * products.box_quantity * billing_carts.quantity
                                 END
                             ) as total_price')
@@ -266,20 +311,30 @@ class Billing extends Controller
             $order_items = new OrderItems();
             $order_items->order_id = $order_id;
             $order_items->product_id = $product->id;
-            $order_items->product_billing_name = $product->billing_name;
+            $order_items->variation_id = $cart_item->variation_id;
+            $order_items->product_billing_name = $product->name;
             $order_items->quantity = $cart_item->quantity;
-            $order_items->mrp = $product->price * $product->box_quantity;
-            // $order_items->discount = $product->discount_price;
-            $order_items->discount = ($product->discount_rate / 100) * $order_items->mrp;
-            $order_items->gst = $product->gst_amount * $product->box_quantity;
-            $order_items->total_price = ($product->total_price * $product->box_quantity) * $cart_item->quantity;
+            if($product->product_type == 'attribute'){
+                $product_variation = ProductVariation::where('id',$cart_item->variation_id)->first();
+                $order_items->product_billing_name .= ' ( '.$product_variation->lable_name.' )';
+                $order_items->mrp = $product_variation->price * $product->box_quantity;
+                $order_items->discount = ($product_variation->discount_rate / 100) * $order_items->mrp;
+                $order_items->gst = $product_variation->gst_amount * $product->box_quantity;
+                $order_items->total_price = ($product_variation->total_price * $product->box_quantity) * $cart_item->quantity;
+            }else{
+                $order_items->mrp = $product->price * $product->box_quantity;
+                // $order_items->discount = $product->discount_price;
+                $order_items->discount = ($product->discount_rate / 100) * $order_items->mrp;
+                $order_items->gst = $product->gst_amount * $product->box_quantity;
+                $order_items->total_price = ($product->total_price * $product->box_quantity) * $cart_item->quantity;
+            }
             $order_items->save();
         }
     }
 
     private function decrese_salesman_product_stock($salesman_id){
         $cart_items = BillingCart::where('salesmen_id',$salesman_id)->get();
-        $daily_sales = DailySales::where('salesman_id',$salesman_id)->where('outing_date',date('Y-m-d'))->first();
+        $daily_sales = DailySales::where('salesman_id',$salesman_id)->where('outing_date',date('Y-m-d'))->latest()->first();
         $assign_products = AssignedProducts::where('daily_sales',$daily_sales->id)->first();
         $products = json_decode($assign_products->products);
         foreach($cart_items as $item){
@@ -296,6 +351,29 @@ class Billing extends Controller
 
     private function clear_cart($salesman_id){
         $cart_items = BillingCart::where('salesmen_id',$salesman_id)->delete();
+    }
+
+    public function clear_carts(Request $request){
+        // return $request->all();
+        if(BillingCart::where('salesmen_id',$request->user()->id)->exists()){
+            $res = BillingCart::where('salesmen_id',$request->user()->id)->delete();
+            if($res){
+                return response()->json([
+                    'status'=>'true',
+                    'massage'=>'Cart Cleared Successfully'
+                ]);
+            }else{
+                return response()->json([
+                    'status'=>'false',
+                    'massage'=>'Cart Not Cleared'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'status'=>'false',
+                'massage'=>'There is no Item in Cart'
+            ]);
+        }
     }
 
 

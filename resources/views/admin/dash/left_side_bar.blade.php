@@ -92,6 +92,17 @@
                 </li>
 
                 <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="fas fa-toilet-paper"></i>
+                        <span>Expenses</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('expence-category.index') }}">Expense Category</a></li>
+                        <li><a href="{{ route('expences.index') }}">All Expenses</a></li>
+                    </ul>
+                </li>
+
+                <li>
                     <a href="{{ route('accounts.index') }}" class="waves-effect">
                         <i class="fas fa-money-check"></i>
                         <span>Manage Accounts 1</span>
@@ -106,11 +117,26 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('damage-received.index') }}" class="waves-effect">
+                        <i class="fas fa-house-damage"></i>
+                        <span>Damage Received</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('damage-paid.index') }}" class="waves-effect">
+                        <i class="fab fa-amazon-pay"></i>
+                        <span>Damage Paid</span>
+                    </a>
+                </li>
+                
+                <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="ti-pie-chart"></i>
                         <span>Reports</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('report.sell-report') }}">Sales Report</a></li>
                         <li><a href="{{ route('report.dealer-wise-sales-report') }}">Dealer Wise Sales</a></li>
                         <li><a href="{{ route('report.salesman-wise-sales-report') }}">Salesman Wise Sales</a></li>
                         <li><a href="{{ route('report.trucks-wise-sales-report') }}">Trucks Wise Sales</a></li>

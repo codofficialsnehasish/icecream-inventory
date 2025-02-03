@@ -74,10 +74,10 @@
                                             <h5 style="margin: 10px 0; font-size: 16px;">Category: {{ get_name('categories', $category) }}</h5>
                                             <ul style="list-style-type: none; padding: 0; margin: 0;">
                                                 @foreach ($items as $product)
-                                                    <li style="margin: 5px 0;">
-                                                        <span style="display: inline-block; width: 50%; font-size: 14px;">{{ get_name('products', $product->product) }}</span>
-                                                        <span style="display: inline-block; width: 25%; text-align: right; font-size: 14px;">Assign Stock: {{ $product->actual_stock }}</span>
-                                                        <span style="display: inline-block; width: 25%; text-align: right; font-size: 14px;">Closing Stock: {{ $product->quantity }}</span>
+                                                    <li style="margin: 5px 0;text-align: left;width: 100%;float: left;">
+                                                        <span style="display: inline-block; font-size: 14px; width: 31%;">{{ get_name('products', $product->product) }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Assign Stock: {{ $product->actual_stock }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Closing Stock: {{ $product->quantity }}</span>
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -88,10 +88,10 @@
                                             <h5 style="margin: 10px 0; font-size: 16px;">Category: {{ get_name('categories', $category) }}</h5>
                                             <ul style="list-style-type: none; padding: 0; margin: 0;">
                                                 @foreach ($items as $product)
-                                                    <li style="margin: 5px 0;">
-                                                        <span style="display: inline-block; width: 70%; font-size: 14px;">{{ get_name('products', $product->product) }}</span>
-                                                        <span style="display: inline-block; width: 25%; text-align: right; font-size: 14px;">Assign Stock: {{ $product->actual_stock }}</span>
-                                                        <span style="display: inline-block; width: 25%; text-align: right; font-size: 14px;">Closing Stock: {{ $product->quantity }}</span>
+                                                    <li style="margin: 5px 0;text-align: left;width: 100%;float: left;">
+                                                        <span style="display: inline-block; font-size: 14px; width: 31%;">{{ get_name('products', $product->product) }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Assign Stock: {{ $product->actual_stock }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Closing Stock: {{ $product->quantity }}</span>
                                                     </li>
                                                 @endforeach
                                             </ul>

@@ -93,6 +93,17 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
+                                    <label class="form-label mb-3 d-flex">Product Type</label>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" id="customRadioInline1" name="product_type" class="form-check-input" value="simple" {{ check_uncheck($product->product_type,'simple') }}>
+                                        <label class="form-check-label" for="customRadioInline1">Simple</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" id="customRadioInline2" name="product_type" class="form-check-input" value="attribute" {{ check_uncheck($product->product_type,'attribute') }}>
+                                        <label class="form-check-label" for="customRadioInline2">Attribute</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label mb-3 d-flex">Visiblity</label>
                                     <div class="form-check form-check-inline">
                                         <input type="radio" id="customRadioInline1" name="is_visible" class="form-check-input" value="1" {{ check_uncheck($product->visibility,1) }}>

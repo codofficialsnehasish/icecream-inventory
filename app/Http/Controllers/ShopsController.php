@@ -114,12 +114,22 @@ class ShopsController extends Controller
 
     public function destroy(string $id)
     {
-        $shop = Shops::find($id);
-        $res = $shop->delete();
-        if($res){
-            return back()->with(['success'=>'Data Deleted Successfully.']);
-        }else{
-            return back()->with(['error'=>'Data Not Deleted.']);
+        try {
+            $shop = Shops::findOrFail($id);
+            if($shop->orders()->exists()) {
+                return back()->with([
+                    'error' => 'Cannot delete shop because it has associated orders.'
+                ]);
+            }
+            $res = $shop->delete();
+            if($res){
+                return back()->with(['success'=>'Data Deleted Successfully.']);
+            }else{
+                return back()->with(['error'=>'Data Not Deleted.']);
+            }
+        } catch (Exception $e) {
+        
+            return back()->with(['error' => 'Something went wrong']);
         }
     }
 }

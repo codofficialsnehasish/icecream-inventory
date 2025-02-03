@@ -29,6 +29,7 @@
 
     <div style="font-size: 10px; margin-bottom: 10px;">
         <p style="margin: 0; text-align: left;"><strong>Customer Details</strong></p>
+        <p style="margin: 0; text-align: left;">Shop Name: <strong>{{ $customer_details->shop_name }}</strong></p>
         <p style="margin: 0; text-align: left;">Owner Name: <strong>{{ $customer_details->owner_name }}</strong></p>
         <p style="margin: 0; text-align: left;">Phone: <strong>{{ $customer_details->whatsapp_number }}</strong></p>
         <p style="margin: 0; text-align: left;">Address: <strong>{{ $customer_details->address }}</strong></p>
@@ -52,9 +53,15 @@
             </tr>
             @foreach($order_items as $item)
             <tr>
-                <td>{{ $item->name }}</td>
+                {{-- <td>{{ $item->name }}</td> --}}
+                <td>{{ $item->product_billing_name }}</td>
                 <td style="text-align: right;">{{ $item->quantity }}</td>
+                @if($item->product_type == 'attribute') 
+                <td style="text-align: right;">{{ $item->mrp * $item->box_quantity * $item->quantity }}</td>
+                @else
                 <td style="text-align: right;">{{ $item->price * $item->box_quantity * $item->quantity }}</td>
+                @endif
+                {{-- <td style="text-align: right;">{{ $item->price ?? $item->mrp }}</td> --}}
             </tr>
             @endforeach
         </table>
@@ -75,7 +82,7 @@
 
     <div style="text-align: center; font-size: 10px; margin-top: 10px;">
         <p style="margin: 0;">Thank You</p>
-        <p style="margin: 0;">Stay cool, and see you again soon!</p>
+        <p style="margin: 0;">Goods once sold cannot be taken back.</p>
     </div>
 
 </body>

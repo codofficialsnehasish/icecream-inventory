@@ -67,23 +67,17 @@
                                     <tr>
                                         <th class="text-wrap">Date</th>
                                         <th class="text-wrap">Salesman</th>
-                                        <th class="text-wrap">Dealer</th>
                                         <th class="text-wrap">Total Bill Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $amount = 0 @endphp
                                     @foreach($items as $item)
-                                    @php $shop = get_shop_details($item->shop_id) @endphp
-                                    @php $amount += $item->grand_total @endphp
+                                    @php $amount += $item->total_grand_total @endphp
                                     <tr>
-                                        <td>{{ format_datetime($item->created_at) }}</td>
+                                        <td>{{ format_date($item->order_date) }}</td>
                                         <td>{{ get_name('salesmen',$item->salesman_id) }}</td>
-                                        <td>
-                                            Name: {{ $shop->shop_name }}<br>
-                                            Owner: {{ $shop->owner_name }}<br>
-                                        </td>
-                                        <td>{{ $item->grand_total }}</td>
+                                        <td>{{ $item->total_grand_total }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -91,8 +85,14 @@
                                     <tr>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
-                                        <td><b>Total Amount - {{ $amount }}</b></td>
+                                        <td>
+                                            <b>Total Amount - {{ $amount }}</b><br>
+                                            <b>Total Expences : {{ $expence }}</b><br>
+                                            <b>Total Online : {{ $online_sell }}</b><br>
+                                            <b>Total Cash : {{ $cash_sell }}</b><br>
+                                            <hr>
+                                            <b>Total Cash in Hand : {{ $cash_in_hand }}</b>
+                                        </td>
                                     </tr>
                                 </tfoot>
                             </table>

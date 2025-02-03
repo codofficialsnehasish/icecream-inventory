@@ -21,6 +21,10 @@ use App\Http\Controllers\{
     AccountsController,
     AccountsController2Controller,
     PDFController,
+    DamageReceivedController,
+    DamagePaidController,
+    ExpenceCategoryController,
+    ExpencesController,
 };
 
 Route::get('/', function (){
@@ -183,6 +187,10 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('reports')->group(function () {
+            
+            Route::get("/sell-report",[Report_Controller::class,"sell_report"])->name('report.sell-report');
+            Route::post("/generate-sell-report",[Report_Controller::class,"generate_sales_report"])->name('report.generate-sell-report');
+            
             Route::get("/dealer-wise-sales-report",[Report_Controller::class,"dealer_wise_sales_report"])->name('report.dealer-wise-sales-report');
             Route::post("/generate-dealer-wise-sales-report",[Report_Controller::class,"generate_dealer_wise_sales_report"])->name('report.generate-dealer-wise-sales-report');
 
@@ -205,6 +213,11 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('accounts', AccountsController::class);
         Route::resource('accounts2', AccountsController2Controller::class);
+        Route::resource('damage-received', DamageReceivedController::class);
+        Route::resource('damage-paid', DamagePaidController::class);
+        Route::resource('expence-category', ExpenceCategoryController::class);
+        Route::get('expences', [ExpencesController::class,'index'])->name('expences.index');
+        Route::post('expences', [ExpencesController::class,'generate_expence_report'])->name('expences.generate-expence-report');
     });
 });
 
