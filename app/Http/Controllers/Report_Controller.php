@@ -400,4 +400,33 @@ class Report_Controller extends Controller
                         ->get();
         return view('admin.reports.accounts_report2')->with($data);
     }
+
+    public function product_wise_sell_report(){
+        $data['title'] = 'Product Sell Report';
+        $data['items'] = OrderItems::all();
+        $data['products'] = Product::all();
+        return view('admin.reports.product_wise_sell_report')->with($data);
+    }
+
+    public function generate_product_wise_sell_report(Request $request){
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $data['title'] = 'Product Sell Report';
+        $data['items'] = OrderItems::when(isset($request->product), function ($query) use ($request) {
+            $query->where(function ($q) use ($request) {
+                $q->where('product_id', $request->product)
+                    ->orWhere('variation_id', $request->product);
+            });
+        })
+        ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+            $query->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate);
+        })
+        ->get();
+                                
+
+        $data['products'] = Product::all();
+        return view('admin.reports.product_wise_sell_report')->with($data);
+    }
 }

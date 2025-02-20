@@ -141,6 +141,7 @@
                         <li><a href="{{ route('report.salesman-wise-sales-report') }}">Salesman Wise Sales</a></li>
                         <li><a href="{{ route('report.trucks-wise-sales-report') }}">Trucks Wise Sales</a></li>
                         <li><a href="{{ route('report.stock-report') }}">Stock Report</a></li>
+                        <li><a href="{{ route('report.product-wise-sell-report') }}">Product Wise Sell</a></li>
                         <li><a href="{{ route('report.account-report') }}">Accounts Report 1</a></li>
                         <li><a href="{{ route('report.account-report2') }}">Accounts Report 2</a></li>
                     </ul>

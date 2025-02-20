@@ -26,6 +26,20 @@
     }
     
 </style>
+<style>
+    @media print {
+        h3 {
+            page-break-after: avoid;
+        }
+        ul {
+            page-break-inside: avoid;
+        }
+        li {
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
 
 <div class="main-content">
 
@@ -64,20 +78,24 @@
                                     $products = get_daily_sales_products($daily_sale->id); 
                                     $groupedProducts = collect($products)->groupBy('category');
                                     $groupedProductsCount = $groupedProducts->count();
-                                    $half = ceil($groupedProductsCount / 2);
-                                    $groupedProductsLeft = $groupedProducts->slice(0, $half);
-                                    $groupedProductsRight = $groupedProducts->slice($half);
+                                    // $half = ceil($groupedProductsCount / 2);
+                                    // $groupedProductsLeft = $groupedProducts->slice(0, $half);
+                                    // $groupedProductsRight = $groupedProducts->slice($half);
                                 @endphp
-                                <div style="display: flex; justify-content: space-between; width: 100%; box-sizing: border-box;">
+                                {{-- <div style="display: flex; justify-content: space-between; width: 100%; box-sizing: border-box;">
                                     <div style="width: 48%; box-sizing: border-box;">
                                         @foreach ($groupedProductsLeft as $category => $items)
                                             <h5 style="margin: 10px 0; font-size: 16px;">Category: {{ get_name('categories', $category) }}</h5>
                                             <ul style="list-style-type: none; padding: 0; margin: 0;">
                                                 @foreach ($items as $product)
                                                     <li style="margin: 5px 0;text-align: left;width: 100%;float: left;">
-                                                        <span style="display: inline-block; font-size: 14px; width: 31%;">{{ get_name('products', $product->product) }}</span>
-                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Assign Stock: {{ $product->actual_stock }}</span>
-                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Closing Stock: {{ $product->quantity }}</span>
+                                                        <span style="display: inline-block; font-size: 14px; width: 31%;">{{ get_name('products', $product->product) }}</span> --}}
+                                                        {{-- <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Assign Stock: {{ $product->actual_stock }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Closing Stock: {{ $product->quantity }}</span> --}}
+                                                        {{-- <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Previous Closing Stock: {{ $product->closing_stock }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Today Assign Stock: {{ $product->provided_qty }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Total Assign Stock: {{ $product->actual_stock }}</span>
+                                                        <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Today Closing Stock: {{ $product->quantity }}</span>
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -97,7 +115,23 @@
                                             </ul>
                                         @endforeach
                                     </div>
-                                </div>
+                                </div> --}}
+                                @foreach ($groupedProducts as $category => $items)
+                                    <h3 style="margin: 20px 0; font-size: 20px;">Category: {{ get_name('categories', $category) }}</h3>
+                                    <ul style="list-style-type: none; padding: 0; margin: 0;">
+                                        @foreach ($items as $product)
+                                            <li style="margin: 5px 0;text-align: left;width: 100%;float: left;">
+                                                <span style="display: inline-block; font-size: 14px; width: 15%;">{{ get_name('products', $product->product) }}</span>
+                                                {{-- <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Assign Stock: {{ $product->actual_stock }}</span>
+                                                <span style="display: inline-block; text-align: right; font-size: 14px; width: 33%;">Closing Stock: {{ $product->quantity }}</span> --}}
+                                                <span style="display: inline-block; text-align: right; font-size: 14px; width: 20%;">Prev Closing Stock: {{ $product->closing_stock }}</span>
+                                                <span style="display: inline-block; text-align: right; font-size: 14px; width: 20%;">Today Assigned: {{ $product->provided_qty }}</span>
+                                                <span style="display: inline-block; text-align: right; font-size: 14px; width: 20%;">Total Assigned: {{ $product->actual_stock }}</span>
+                                                <span style="display: inline-block; text-align: right; font-size: 14px; width: 20%;">Today Closing: {{ $product->quantity }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endforeach
                             </div>
                         </div>
                     </div>

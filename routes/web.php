@@ -208,6 +208,9 @@ Route::middleware('auth')->group(function () {
 
             Route::get("account-report2",[Report_Controller::class,"account_report2"])->name('report.account-report2');
             Route::post("generate-account-report2",[Report_Controller::class,"generate_account_report2"])->name('report.generate-account-report2');
+
+            Route::get("product-wise-sell-report",[Report_Controller::class,"product_wise_sell_report"])->name('report.product-wise-sell-report');
+            Route::post("generate-product-wise-sell-report",[Report_Controller::class,"generate_product_wise_sell_report"])->name('report.generate-product-wise-sell-report');
         });
 
 
