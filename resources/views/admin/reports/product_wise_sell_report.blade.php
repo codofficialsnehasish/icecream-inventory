@@ -31,14 +31,14 @@
                             <form action="{{ route('report.generate-product-wise-sell-report') }}" method="post">
                                 @csrf
                                 <div class="row">
-                                    <div class="mb-0 col-md-6">
+                                    <div class="mb-0 col-md-4">
                                         <label class="form-label">Search Using Date</label>
                                         <div class="input-daterange input-group" id="datepicker6" data-date-format="yyyy-mm-dd" data-date-autoclose="true" data-provide="datepicker" data-date-container='#datepicker6'>
                                             <input type="text" class="form-control" name="start_date" placeholder="Start Date" value="" autocomplete="off" />
                                             <input type="text" class="form-control" name="end_date" placeholder="End Date" value="" autocomplete="off" />
                                         </div>
                                     </div>
-                                    <div class="mb-0 col-md-4">
+                                    <div class="mb-0 col-md-3">
                                         <label class="form-label">Choose Product</label>
                                         <select class="form-control select2" name="product">
                                             <option value selected disabled>Select...</option>
@@ -54,6 +54,15 @@
                                                     {{ $product->name }}
                                                 </option>
                                             @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-0 col-md-3">
+                                        <label class="form-label">Choose Trucks</label>
+                                        <select class="form-control select2" name="trucks_id">
+                                            <option value selected disabled>Select...</option>
+                                            @foreach($trucks as $truck)
+                                            <option value="{{ $truck->id }}">{{ $truck->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -75,7 +84,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-wrap">SL. No.</th>
-                                        <th class="text-wrap">Date</th>
+                                        {{-- <th class="text-wrap">Date</th> --}}
                                         <th class="text-wrap">Product</th>
                                         <th class="text-wrap">Quantity</th>
                                     </tr>
@@ -83,20 +92,20 @@
                                 <tbody>
                                     @php $quantity = 0 @endphp
                                     @foreach($items as $item)
-                                    @php $quantity += $item->quantity @endphp
+                                    @php $quantity += $item->total_quantity @endphp
                                     <tr>
                                         <td class="text-wrap">{{ $loop->iteration }}</td>
-                                        <td class="text-wrap">{{ format_datetime($item->created_at) }}</td>
+                                        {{-- <td class="text-wrap">{{ format_datetime($item->created_at) }}</td> --}}
                                         <td class="text-wrap">{{ $item->product_billing_name }}</td>
-                                        <td class="text-wrap">{{ $item->quantity }}</td>
+                                        <td class="text-wrap">{{-- $item->quantity --}} {{ $item->total_quantity }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td></td>
-                                        <td></td>
-                                        <td><b>Total Amount :</b></td>
+                                        {{-- <td></td> --}}
+                                        <td><b>Total Quantity :</b></td>
                                         <td>
                                             <b>{{ $quantity }}</b>
                                         </td>

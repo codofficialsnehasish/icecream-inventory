@@ -403,8 +403,14 @@ class Report_Controller extends Controller
 
     public function product_wise_sell_report(){
         $data['title'] = 'Product Sell Report';
-        $data['items'] = OrderItems::all();
+        // $data['items'] = OrderItems::all();
+        $data['items'] = OrderItems::select('product_id', 'product_billing_name', DB::raw('SUM(quantity) as total_quantity'))
+                                    ->groupBy('product_id', 'product_billing_name')
+                                    ->get();
+    
+
         $data['products'] = Product::all();
+        $data['trucks'] = Trucks::where('is_visible',1)->get();
         return view('admin.reports.product_wise_sell_report')->with($data);
     }
 
@@ -413,20 +419,67 @@ class Report_Controller extends Controller
         $endDate = $request->end_date;
 
         $data['title'] = 'Product Sell Report';
-        $data['items'] = OrderItems::when(isset($request->product), function ($query) use ($request) {
-            $query->where(function ($q) use ($request) {
-                $q->where('product_id', $request->product)
-                    ->orWhere('variation_id', $request->product);
-            });
-        })
-        ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
-            $query->whereDate('created_at', '>=', $startDate)
-                    ->whereDate('created_at', '<=', $endDate);
-        })
-        ->get();
+        // $data['items'] = OrderItems::when(isset($request->product), function ($query) use ($request) {
+        //     $query->where(function ($q) use ($request) {
+        //         $q->where('product_id', $request->product)
+        //             ->orWhere('variation_id', $request->product);
+        //     });
+        // })
+        // ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+        //     $query->whereDate('created_at', '>=', $startDate)
+        //             ->whereDate('created_at', '<=', $endDate);
+        // })
+        // ->get();
+
+        // $data['items'] = OrderItems::select('product_id', 'product_billing_name', DB::raw('SUM(quantity) as total_quantity'))
+        //                             ->when(isset($request->product), function ($query) use ($request) {
+        //                                 $query->where(function ($q) use ($request) {
+        //                                     $q->where('product_id', $request->product)
+        //                                         ->orWhere('variation_id', $request->product);
+        //                                 });
+        //                             })
+        //                             ->when(isset($request->trucks_id), function ($query) use ($request) {
+        //                                 $query->where(function ($q) use ($request) {
+        //                                     $q->where('product_id', $request->product)
+        //                                         ->orWhere('variation_id', $request->product);
+        //                                 });
+        //                             })
+        //                             ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+        //                                 $query->whereDate('created_at', '>=', $startDate)
+        //                                     ->whereDate('created_at', '<=', $endDate);
+        //                             })
+        //                             ->groupBy('product_id', 'product_billing_name')
+        //                             ->get();
+
+        $data['items'] = OrderItems::select(
+                                        'order_items.product_id',
+                                        'order_items.product_billing_name',
+                                        DB::raw('SUM(order_items.quantity) as total_quantity')
+                                    )
+                                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                                    ->leftJoin('daily_sales as d', 'orders.salesman_id', '=', 'd.salesman_id')
+                                    ->leftJoin('trucks as t', 'd.truck_id', '=', 't.id')
+                                    ->whereRaw('DATE(d.outing_date) = DATE(orders.created_at)')
+                                    ->when(!empty($request->trucks_id), function ($query) use ($request) {
+                                        $query->where('t.id', $request->trucks_id); // filter by truck only if present
+                                    })
+                                    ->when(!empty($startDate) && !empty($endDate), function ($query) use ($startDate, $endDate) {
+                                        $query->whereDate('orders.created_at', '>=', $startDate)
+                                            ->whereDate('orders.created_at', '<=', $endDate);
+                                    })
+                                    ->when(!empty($request->product), function ($query) use ($request) {
+                                        $query->where(function ($q) use ($request) {
+                                            $q->where('order_items.product_id', $request->product)
+                                                ->orWhere('order_items.variation_id', $request->product);
+                                        });
+                                    })
+                                    ->groupBy('order_items.product_id', 'order_items.product_billing_name')
+                                    ->get();
+    
                                 
 
         $data['products'] = Product::all();
+        $data['trucks'] = Trucks::where('is_visible',1)->get();
         return view('admin.reports.product_wise_sell_report')->with($data);
     }
 }
