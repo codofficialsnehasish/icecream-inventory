@@ -272,8 +272,18 @@ class Billing extends Controller
                             ->first();
             $order->payment_mode = $request->payment_mode;
             if($request->payment_mode == 'Online&Cash'){
-                $order->cash = $request->cash;
-                $order->online = $request->online;
+                // $order->cash = $request->cash;
+                // $order->online = $request->online;
+
+                if(($request->cash + $request->online) == $order->grand_total){
+                    $order->cash = $request->cash;
+                    $order->online = $request->online;
+                }else{
+                    return response()->json([
+                        'status'=>'false',
+                        'massage'=>'Online + Cash value not match Order Total',
+                    ]);
+                }
             }
             $order->is_paid = $request->is_paid;
     
