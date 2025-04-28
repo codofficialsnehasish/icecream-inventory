@@ -9,6 +9,11 @@ class SalesmanController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin.salesmans.';
+
+        $this->middleware('role_or_permission:Salesman Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Salesman Create', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Salesman Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Salesman Delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.

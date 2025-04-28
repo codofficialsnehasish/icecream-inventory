@@ -21,6 +21,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Trucks Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -30,6 +31,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -44,7 +46,9 @@
                                         <th class="text-wrap">Name</th>
                                         <th class="text-wrap">Image</th>
                                         <th class="text-wrap">Visibility</th>
+                                        @canany(['Trucks Edit','Trucks Delete'])
                                         <th>Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -54,15 +58,21 @@
                                         <td>{{ $truck->name }}</td>
                                         <td><img src="{{ asset($truck->image) }}" alt="" width="60px"></td>
                                         <td>{!! check_visibility($truck->is_visible) !!}</td>
+                                        @canany(['Trucks Edit','Trucks Delete'])
                                         <td>
+                                            @can('Trucks Edit')
                                             <a class="btn btn-primary" href="{{ route('trucks.edit',$truck->id) }}" alt="edit"><i class="ti-check-box"></i></a>
                                             <!-- <a class="btn btn-danger" onclick="return confirm('Are You Sure?')" href="{{ route('products.delete',$truck->id) }}"><i class="ti-trash"></i></a> -->
+                                            @endcan
+                                            @can('Trucks Delete')
                                             <form action="{{ route('trucks.destroy', $truck->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

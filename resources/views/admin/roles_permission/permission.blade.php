@@ -22,7 +22,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
-                    @can('Create Permission')
+                    @can('Permission Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -44,23 +44,33 @@
                                 <thead>
                                     <tr>
                                         <th class="text-wrap">Name</th>
+                                        <th class="text-wrap">Group Name</th>
+                                        @canany(['Permission Edit','Permission Delete'])
                                         <th class="text-wrap">Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($permissions as $permission)
                                     <tr>
                                         <td>{{ $permission->name }}</td>
+                                        <td>{{ $permission->group_name }}</td>
+                                        @canany(['Permission Edit','Permission Delete'])
                                         <td class="d-flex">
+                                            @can('Permission Edit')
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdropedit{{ $permission->id }}" style="margin-right: 10px;"> 
                                                 <i class="ti-check-box"></i>
                                             </button>
-                                            <form action="{{ route('permission.destroy', ['permissionId' => $permission->id]) }}" method="POST">
+                                            @endcan
+                                            @can('Permission Delete')
+                                            <form action="{{ route('permission.destroy', ['permissionId' => $permission->id]) }}" onsubmit="return confirm('Are you sure?')" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -80,6 +90,13 @@
                         <form action="{{ route('permission.create') }}" method="post">
                         @csrf
                         <div class="modal-body">
+                            <div class="position-relative mb-3">
+                                <label for="group-name" class="form-label">Group Name</label>
+                                <input type="text" name="group_name" class="form-control" id="group-name" placeholder="Write permission group name here..." required="">
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
                             <div class="position-relative">
                                 <label for="permission-name" class="form-label">Permission Name</label>
                                 <input type="text" name="name" class="form-control" id="permission-name" placeholder="Write permission name here..." required="">
@@ -108,6 +125,13 @@
                         <form action="{{ route('permission.update', ['permissionId' => $permission->id]) }}" method="post">
                         @csrf
                         <div class="modal-body">
+                            <div class="position-relative mb-3">
+                                <label for="group-name" class="form-label">Group Name</label>
+                                <input type="text" name="group_name" class="form-control" id="group-name" placeholder="Write permission group name here..." value="{{ $permission->group_name }}" required="">
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
                             <div class="position-relative">
                                 <label for="role-name" class="form-label">Role Name</label>
                                 <input type="text" name="name" class="form-control" id="role-name" placeholder="Write Role name here..." value="{{ $permission->name }}" required="">

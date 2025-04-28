@@ -21,6 +21,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Expence Category Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -30,6 +31,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -43,7 +45,9 @@
                                         <th class="text-wrap">SL. No.</th>
                                         <th class="text-wrap">Name</th>
                                         <th class="text-wrap">Visibility</th>
+                                        @canany(['Expence Category Edit','Expence Category Delete'])
                                         <th>Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,14 +56,20 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $expence_category->name }}</td>
                                         <td>{!! check_visibility($expence_category->is_visible) !!}</td>
+                                        @canany(['Expence Category Edit','Expence Category Delete'])
                                         <td>
+                                            @can('Expence Category Edit')
                                             <a class="btn btn-primary" href="{{ route('expence-category.edit',$expence_category->id) }}" alt="edit"><i class="ti-check-box"></i></a>
+                                            @endcan
+                                            @can('Expence Category Delete')
                                             <form action="{{ route('expence-category.destroy', $expence_category->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

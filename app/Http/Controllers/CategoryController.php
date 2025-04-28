@@ -12,6 +12,11 @@ class CategoryController extends Controller
 {
     public function __construct(){
         $this->view_path = "admin.category.";
+
+        $this->middleware('role_or_permission:All Category', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Add Category', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Edit Category', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Delete Category', ['only' => ['delete']]);
     }
 
     public function index(Request $request){

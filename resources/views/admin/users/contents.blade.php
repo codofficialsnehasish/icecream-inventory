@@ -21,6 +21,7 @@
                                 <li class="breadcrumb-item active" aria-current="page">All {{ $title }}</li>
                             </ol>
                         </div>
+                        @can('Users Create')
                         <div class="col-md-4">
                             <div class="float-end d-none d-md-block">
                                 <div class="dropdown">
@@ -30,6 +31,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endcan
                     </div>
                 </div>
                 <!-- end page title -->
@@ -46,7 +48,9 @@
                                             <th>Name</th>
                                             <th>Role</th>
                                             <th>Email</th>
+                                            @canany(['Users Edit','Users Delete'])
                                             <th>Action</th>
+                                            @endcanany
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -56,10 +60,16 @@
                                             <td class="text-wrap">{{$user->name}}</td>
                                             <td>{{ get_role($user->id) }}</td>
                                             <td>{{$user->email}}</td>
+                                            @canany(['Users Edit','Users Delete'])
                                             <td>
+                                                @can('Users Edit')
                                                 <a class="btn btn-primary" href="{{ route('users.edit',$user->id) }}" alt="edit"><i class="ti-check-box"></i></a>
+                                                @endcan
+                                                @can('Users Delete')
                                                 <a class="btn btn-danger" onclick="return confirm('Are You Sure?')" href="{{ route('users.delete',$user->id)}}"><i class="ti-trash"></i></a>
+                                                @endcan
                                             </td>
+                                            @endcanany
                                         </tr>
                                         @endforeach
                                     </tbody>

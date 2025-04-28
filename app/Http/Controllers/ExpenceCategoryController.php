@@ -9,6 +9,11 @@ class ExpenceCategoryController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin.expence_categorys.';
+
+        $this->middleware('role_or_permission:Expence Category Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Expence Category Create', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Expence Category Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Expence Category Delete', ['only' => ['destroy']]);
     }
 
     public function index()

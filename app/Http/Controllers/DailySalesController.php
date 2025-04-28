@@ -15,6 +15,12 @@ class DailySalesController extends Controller
 {
     public function __construct(){
         $this->view_path = "admin.daily_sales.";
+
+        $this->middleware('role_or_permission:All Asignments', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Make Asignment', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:View Assigned Products', ['only' => ['show_assigned_products']]);
+        $this->middleware('role_or_permission:View Assigned Products Report', ['only' => ['show_assigned_products_report']]);
+        $this->middleware('role_or_permission:Delete Asignment', ['only' => ['destroy']]);
     }
 
     public function index()

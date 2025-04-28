@@ -12,6 +12,11 @@ class ShopsController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin.shops.';
+
+        $this->middleware('role_or_permission:Shops Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Shops Create', ['only' => ['create']]);
+        $this->middleware('role_or_permission:Shops Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Shops Delete', ['only' => ['destroy']]);
     }
 
     public function index()

@@ -10,6 +10,11 @@ class AccountsController extends Controller
 {
     public function __construct(){
         $this->view_path = "admin.accounts.";
+
+        $this->middleware('role_or_permission:Accounts Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Accounts Create', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Accounts Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Accounts Delete', ['only' => ['destroy']]);
     }
 
     public function index()

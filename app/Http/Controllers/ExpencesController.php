@@ -11,6 +11,11 @@ use App\Models\ExpenceCategory;
 
 class ExpencesController extends Controller
 {
+    public function __construct(){
+        $this->middleware('role_or_permission:All Expences', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Expence Report', ['only' => ['generate_expence_report']]);
+    }
+
     public function index()
     {
         $title = "Expences";

@@ -17,6 +17,23 @@ class ProductController extends Controller
 {
     public function __construct(){
         $this->view_path = "admin.products.";
+
+        $this->middleware('role_or_permission:All Products', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Update Product Stock', ['only' => ['update_product_stock']]);
+        $this->middleware('role_or_permission:Add Product', ['only' => ['basic_info_create','basic_info_process',]]);
+        $this->middleware('role_or_permission:Edit Product', ['only' => [
+                                                                            'basic_info_edit',
+                                                                            'basic_info_edit_process',
+                                                                            'price_edit',
+                                                                            'price_edit_process',
+                                                                            'inventory_edit',
+                                                                            'inventory_edit_process',
+                                                                            'variation_edit',
+                                                                            'variation_edit_process',
+                                                                            'product_images_edit',
+                                                                            'product_images_edit_process'
+                                                                        ]]);
+        $this->middleware('role_or_permission:Delete Product', ['only' => ['destroy','destroy_product_image']]);
     }
 
     public function index()

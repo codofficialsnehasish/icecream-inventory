@@ -12,6 +12,10 @@ class BillingController extends Controller
 {
     public function __construct(){
         $this->view_path = "admin.billings.";
+        
+        $this->middleware('role_or_permission:All Bills', ['only' => ['index']]);
+        $this->middleware('role_or_permission:Todays Bills', ['only' => ['todays_bills']]);
+        $this->middleware('role_or_permission:Bill Details', ['only' => ['bill_details']]);
     }
 
     public function index(){

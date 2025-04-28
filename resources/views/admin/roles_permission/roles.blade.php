@@ -22,6 +22,7 @@
                             <li class="breadcrumb-item active" aria-current="page">Role</li>
                         </ol>
                     </div>
+                    @can('Role Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -31,6 +32,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -42,30 +44,43 @@
                                 <thead>
                                     <tr>
                                         <th class="text-wrap">Name</th>
+                                        @can('Give Permission To Role')
                                         <th class="text-wrap">Asign Permission to Role</th>
+                                        @endcan
+                                        @canany(['Role Edit','Role Delete'])
                                         <th class="text-wrap">Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($roles as $role)
                                     <tr>
                                         <td>{{ $role->name }}</td>
+                                        @can('Give Permission To Role')
                                         <td>
                                             <!-- <a href="{{ route('role.give-permissions', ['roleId' => $role->id]) }}" class="btn btn-outline-success">Asign Permission</a> -->
-                                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop_assign_permission{{ $role->id }}"> 
+                                            <a href="{{ route('role.addPermissionToRole', ['roleId' => $role->id]) }}" class="btn btn-outline-success">Asign Permission</a>
+                                            {{-- <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop_assign_permission{{ $role->id }}"> 
                                                 Asign Permission
-                                            </button>
+                                            </button> --}}
                                         </td>
+                                        @endcan
+                                        @canany(['Role Edit','Role Delete'])
                                         <td class="d-flex">
+                                            @can('Role Edit')
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdropedit{{ $role->id }}" style="margin-right: 10px;"> 
                                                 <i class="ti-check-box"></i>
                                             </button>
-                                            <form action="{{ route('role.destroy', ['roleId' => $role->id]) }}" method="POST">
+                                            @endcan
+                                            @can('Role Delete')
+                                            <form action="{{ route('role.destroy', ['roleId' => $role->id]) }}" onsubmit="return confirm('Are you sure?')" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

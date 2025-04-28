@@ -21,6 +21,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Salesman Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -30,6 +31,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -46,7 +48,9 @@
                                         <th class="text-wrap">Password</th>
                                         <th class="text-wrap">Image</th>
                                         <th class="text-wrap">Status</th>
+                                        @canany(['Salesman Edit','Salesman Delete'])
                                         <th>Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -58,14 +62,20 @@
                                         <td>{{ $salesman->password }}</td>
                                         <td><img src="{{ asset($salesman->image) }}" alt="" width="60px"></td>
                                         <td>{!! check_status($salesman->status) !!}</td>
+                                        @canany(['Salesman Edit','Salesman Delete'])
                                         <td>
+                                            @can('Salesman Edit')
                                             <a class="btn btn-primary" href="{{ route('salesmans.edit',$salesman->id) }}" alt="edit"><i class="ti-check-box"></i></a>
+                                            @endcan
+                                            @can('Salesman Delete')
                                             <form action="{{ route('salesmans.destroy', $salesman->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

@@ -13,13 +13,15 @@ use App\Http\Controllers\{
 use App\Http\Controllers\API\{
     Billing,
     ExpenceAPI,
+    CategoryAPI,
 };
 
 
 Route::post('/login', [AuthController::class, 'app_login']);
 
 Route::middleware('auth:sanctum')->group( function () {
-    Route::get('/get-gategory', [CategoryController::class, 'index']);
+    // Route::get('/get-gategory', [CategoryController::class, 'index']);
+    Route::get('/get-gategory', [CategoryAPI::class, 'index']);
     Route::post('/get-products-by-category', [ProductController::class, 'get_products_by_category_id']);
 
     Route::post('/add-to-billing-cart', [Billing::class, 'add_to_billing_cart']);

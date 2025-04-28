@@ -72,7 +72,6 @@ Route::middleware('auth')->group(function () {
                 Route::post("{roleId}/update-role",'update_role')->name('role.update');
                 Route::put("/{roleId}/destroy-role",'destroy_role')->name('role.destroy');
 
-                Route::get("/{roleId}/add-permission-to-role",'addPermissionToRole')->name('role.addPermissionToRole');
                 Route::post("/{roleId}/give-permissions",'givePermissionToRole')->name('role.give-permissions');
             });
         });

@@ -21,6 +21,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Shops Create')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -30,6 +31,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -49,7 +51,9 @@
                                         <th class="text-wrap">Freezer Capacity</th>
                                         <th class="text-wrap">Freezer Serial Number</th>
                                         <th class="text-wrap">Visibility</th>
+                                        @canany(['Shops Edit','Shops Delete'])
                                         <th>Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -64,14 +68,20 @@
                                         <td>{{ $shop->freezer_capacity }}</td>
                                         <td>{{ $shop->freezer_serial_number }}</td>
                                         <td>{!! check_visibility($shop->is_visible) !!}</td>
+                                        @canany(['Shops Edit','Shops Delete'])
                                         <td>
+                                            @can('Shops Edit')
                                             <a class="btn btn-primary" href="{{ route('shops.edit',$shop->id) }}" alt="edit"><i class="ti-check-box"></i></a>
+                                            @endcan
+                                            @can('Shops Delete')
                                             <form action="{{ route('shops.destroy', $shop->id) }}" onsubmit="return confirm('Are You Sure?')" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

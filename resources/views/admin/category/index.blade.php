@@ -21,6 +21,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Add Category')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -30,6 +31,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -44,7 +46,9 @@
                                         <th class="text-wrap">Name</th>
                                         <th class="text-wrap">Image</th>
                                         <th class="text-wrap">Visibility</th>
+                                        @canany(['Edit Category','Delete Category'])
                                         <th>Action</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -54,10 +58,16 @@
                                         <td>{{ $category->name }}</td>
                                         <td><img src="{{ asset($category->image) }}" alt="" width="60px"></td>
                                         <td>{!! check_visibility($category->visibility) !!}</td>
+                                        @canany(['Edit Category','Delete Category'])
                                         <td>
+                                            @can('Edit Category')
                                             <a class="btn btn-primary" href="{{ route('category.edit',$category->id) }}" alt="edit"><i class="ti-check-box"></i></a>
+                                            @endcan
+                                            @can('Delete Category')
                                             <a class="btn btn-danger" onclick="return confirm('Are You Sure?')" href="{{ route('category.delete',$category->id) }}"><i class="ti-trash"></i></a>
+                                            @endcan
                                         </td>
+                                        @endcanany
                                     </tr>
                                     @endforeach
                                 </tbody>

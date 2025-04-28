@@ -37,7 +37,9 @@
                                         <th class="text-wrap">Shop Details</th>
                                         <th class="text-wrap">Price Details</th>
                                         <th class="text-wrap">Payment</th>
+                                        @can('Bill Details')
                                         <th class="text-wrap">Bill</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,7 +68,9 @@
                                             Online : {{ $bill->online }}<br>
                                             @endif
                                         </td>
+                                        @can('Bill Details')
                                         <td><a href="{{ route('generate-pdf',$bill->id) }}" class="btn btn-info">View Bill</a></td>
+                                        @endcan
                                     </tr>
                                     @endforeach
                                 </tbody>

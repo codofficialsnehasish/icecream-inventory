@@ -17,6 +17,17 @@ use Illuminate\Support\Facades\DB;
 
 class Report_Controller extends Controller
 {    
+    public function __construct(){
+        $this->middleware('role_or_permission:Sell Report', ['only' => ['sell_report','generate_sales_report']]);
+        $this->middleware('role_or_permission:Dealer Wise Sales Report', ['only' => ['dealer_wise_sales_report','generate_dealer_wise_sales_report']]);
+        $this->middleware('role_or_permission:Stock Report', ['only' => ['stock_report']]);
+        $this->middleware('role_or_permission:Salesman Wise Sales Report', ['only' => ['salesman_wise_sales_report','generate_salesman_wise_sales_report']]);
+        $this->middleware('role_or_permission:Truckes Wise Sales Report', ['only' => ['trucks_wise_sales_report','generate_trucks_wise_sales_report']]);
+        $this->middleware('role_or_permission:Accounts Report 1', ['only' => ['account_report','generate_account_report']]);
+        $this->middleware('role_or_permission:Accounts Report 2', ['only' => ['account_report2','generate_account_report2']]);
+        $this->middleware('role_or_permission:Product Sell Report', ['only' => ['product_wise_sell_report','generate_product_wise_sell_report']]);
+    }
+
     public function sell_report(){
         $title = "Sell Report";
 

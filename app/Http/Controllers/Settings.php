@@ -10,6 +10,9 @@ class Settings extends Controller
 {
     public function __construct() {
         $this->view_path = 'admin.settings.';
+
+        $this->middleware('role_or_permission:Site Settings', ['only' => ['content','add_content']]);
+        $this->middleware('role_or_permission:Bill Settings', ['only' => ['bill_settings','process_bill_settings']]);
     }
 
     public function content(){

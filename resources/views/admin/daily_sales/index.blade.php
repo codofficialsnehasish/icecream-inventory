@@ -40,6 +40,7 @@
                             <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
                         </ol>
                     </div>
+                    @can('Make Asignment')
                     <div class="col-md-4">
                         <div class="float-end d-none d-md-block">
                             <div class="dropdown">
@@ -49,6 +50,7 @@
                             </div>
                         </div>
                     </div>
+                    @endcan
                 </div>
             </div>
 
@@ -63,8 +65,12 @@
                                         <th class="text-wrap">Outing Date</th>
                                         <th class="text-wrap">Salesman Name</th>
                                         <th class="text-wrap">Truck</th>
+                                        @canany(['View Assigned Products','View Assigned Products Report'])
                                         <th class="text-wrap">Products</th>
+                                        @endcanany
+                                        @can('Delete Asignment')
                                         <th>Action</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,11 +80,18 @@
                                         <td>{{ format_date($daily_sale->outing_date) }}</td>
                                         <td>{{ get_name('salesmen',$daily_sale->salesman_id) }}</td>
                                         <td>{{ get_name('trucks',$daily_sale->truck_id) }}</td>
+                                        @canany(['View Assigned Products','View Assigned Products Report'])
                                         <td>
                                             {{--<button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{$daily_sale->id}}">View Assigned Products</button> --}}
+                                            @can('View Assigned Products')
                                             <a class="btn btn-outline-success" href="{{ route('daily-sales.show-assigned-products',$daily_sale->id) }}">View Assigned Products</a>
+                                            @endcan
+                                            @can('View Assigned Products Report')
                                             <a class="btn btn-outline-primary" href="{{ route('daily-sales.show-assigned-products-report',$daily_sale->id) }}">Report</a>
+                                            @endcan
                                         </td>
+                                        @endcanany
+                                        @can('Delete Asignment')
                                         <td>
                                             {{--<a class="btn btn-primary" href="{{ route('daily-sales.edit',$daily_sale->id) }}" alt="edit"><i class="ti-check-box"></i></a> --}}
                                             <form action="{{ route('daily-sales.destroy', $daily_sale->id) }}" onsubmit="return confirm('Are you sure?')" method="POST" style="display:inline;">
@@ -87,6 +100,7 @@
                                                 <button class="btn btn-danger" type="submit"><i class="ti-trash"></i></button>
                                             </form>
                                         </td>
+                                        @endcan
                                     </tr>
                                     @endforeach
                                     {{--<div class="modal fade" id="staticBackdrop{{$daily_sale->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

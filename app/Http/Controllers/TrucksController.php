@@ -9,6 +9,11 @@ class TrucksController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin.trucks.';
+
+        $this->middleware('role_or_permission:Trucks Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Trucks Create', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Trucks Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Trucks Delete', ['only' => ['destroy']]);
     }
     /**
      * Display a listing of the resource.

@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class DamagePaidController extends Controller
 {
+    public function __construct(){
+        $this->middleware('role_or_permission:Damage Paid Show', ['only' => ['index','show']]);
+        $this->middleware('role_or_permission:Damage Paid Create', ['only' => ['create','store']]);
+        $this->middleware('role_or_permission:Damage Paid Edit', ['only' => ['edit','update']]);
+        $this->middleware('role_or_permission:Damage Paid Delete', ['only' => ['destroy']]);
+    }
+
     public function index()
     {
         $title = "Damage Paid";

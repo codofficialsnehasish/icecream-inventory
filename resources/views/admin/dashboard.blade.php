@@ -30,6 +30,7 @@
                         <!-- end page title -->
                         
                         <div class="row">
+                            @can('Total Products')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('products.index') }}">
@@ -45,6 +46,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Total Dealers')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('shops.index') }}">
@@ -60,6 +63,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Orders')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -75,6 +80,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Sell')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -90,6 +97,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Online Sell')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -105,6 +114,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Cash Sell')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -120,6 +131,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Expences')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -135,6 +148,8 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
+                            @can('Todays Cash In Hand')
                             <div class="col-xl-3 col-md-6">
                                 <div class="card mini-stat bg-primary text-white">
                                     <a href="{{ route('bills.todays-bill') }}">
@@ -150,8 +165,10 @@
                                     </a>
                                 </div>
                             </div>
+                            @endcan
                         </div>
 
+                        @can('Todays Orders')
                         <div class="row">
                             <div class="col-xl-12">
                                 <div class="card">
@@ -189,6 +206,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endcan
 
                     </div>
                 </div>

@@ -14,6 +14,11 @@ class PermissionController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin/roles_permission/';
+
+        $this->middleware('role_or_permission:Permission Show', ['only' => ['permission']]);
+        $this->middleware('role_or_permission:Permission Create', ['only' => ['create_permission']]);
+        $this->middleware('role_or_permission:Permission Edit', ['only' => ['update_permission']]);
+        $this->middleware('role_or_permission:Permission Delete', ['only' => ['destroy_permission']]);
     }
 
     public function permission(){
@@ -24,12 +29,17 @@ class PermissionController extends Controller
 
     public function create_permission(Request $r){
         $validator = Validator::make($r->all(), [
-            'name' => 'required|string|unique:permissions,name'
+            'name' => 'required|string|unique:permissions,name',
+            'group_name' => 'required|string'
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator->errors());
         }else{
-            $permission = Permission::create(['name' => $r->name]);
+            // $permission = Permission::create(['name' => $r->name, 'group_name'=>$this->group_name]);
+            $permission = new Permission();
+            $permission->name = $r->name;
+            $permission->group_name = $r->group_name;
+            $res = $permission->save(); 
             if($permission){
                 return back()->with(['success'=>'Role Created Successfully']);
             }else{
@@ -47,6 +57,7 @@ class PermissionController extends Controller
         }else{
             $permission = Permission::findOrFail($permissionId);
             $permission->name = $r->name;
+            $permission->group_name = $r->group_name;
             $res = $permission->update(); 
             if($res){
                 return back()->with(['success'=>'Permission Updated Successfully']);

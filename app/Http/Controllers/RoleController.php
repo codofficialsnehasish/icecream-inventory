@@ -15,6 +15,12 @@ class RoleController extends Controller
 {
     public function __construct(){
         $this->view_path = 'admin/roles_permission/';
+
+        $this->middleware('role_or_permission:Role Show', ['only' => ['roles']]);
+        $this->middleware('role_or_permission:Role Create', ['only' => ['create_role']]);
+        $this->middleware('role_or_permission:Role Edit', ['only' => ['update_role']]);
+        $this->middleware('role_or_permission:Role Delete', ['only' => ['destroy_role']]);
+        $this->middleware('role_or_permission:Give Permission To Role', ['only' => ['addPermissionToRole','givePermissionToRole']]);
     }
 
     public function roles(){
@@ -76,7 +82,8 @@ class RoleController extends Controller
                             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
                             ->all();
 
-        return view($this->view_path.'add_permission',[
+        return view($this->view_path.'asign_permission',[
+            'title' => 'Assign Permission',
             'role' => $role,
             'permissions' => $permissions,
             'rolePermissions' => $rolePermissions
@@ -84,9 +91,9 @@ class RoleController extends Controller
     }
 
     public function givePermissionToRole(Request $request, $roleId){
-        $request->validate([
-            'permission' => 'required'
-        ]);
+        // $request->validate([
+        //     'permission' => 'required'
+        // ]);
 
         $role = Role::findOrFail($roleId);
         $res = $role->syncPermissions($request->permission);
